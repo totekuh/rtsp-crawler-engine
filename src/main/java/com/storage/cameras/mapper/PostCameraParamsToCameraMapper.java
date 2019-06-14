@@ -1,0 +1,40 @@
+package com.storage.cameras.mapper;
+
+import com.storage.cameras.model.Camera;
+import com.storage.cameras.rest.PostCameraParams;
+
+import java.util.Date;
+
+import static com.storage.cameras.util.DateTimeUtil.formatString;
+
+public interface PostCameraParamsToCameraMapper {
+    PostCameraParamsToCameraMapper INSTANCE = new PostCameraParamsToCameraMapper() {
+        @Override
+        public Camera toNewCamera(final PostCameraParams params) {
+            final Camera newCamera = new Camera();
+            newCamera.setCreationTimestamp(formatString(params.getTimestamp()));
+            newCamera.setStatus(params.getStatus());
+            newCamera.setUrl(params.getUrl());
+            newCamera.setCity(params.getCity());
+            newCamera.setCountryCode(params.getCountryCode());
+            newCamera.setCountryName(params.getCountryName());
+            newCamera.setIsp(params.getIsp());
+            return newCamera;
+        }
+
+        @Override
+        public Camera toUpdatedCamera(final Camera camera, final PostCameraParams params) {
+            camera.setStatus(params.getStatus());
+            camera.setIsp(params.getIsp());
+            camera.setCountryCode(params.getCountryCode());
+            camera.setCountryName(params.getCountryName());
+            camera.setCity(params.getCity());
+            camera.setUpdateTimestamp(new Date());
+            return camera;
+        }
+    };
+
+    Camera toNewCamera(PostCameraParams params);
+
+    Camera toUpdatedCamera(Camera camera, PostCameraParams params);
+}

@@ -18,7 +18,7 @@ public class CameraRestController {
 
     private final CameraService cameraService;
 
-    @PostMapping
+    @PostMapping("/import")
     public ResponseEntity receive(@RequestBody final PostCameraParams params) {
         return ok(cameraService.save(params));
     }

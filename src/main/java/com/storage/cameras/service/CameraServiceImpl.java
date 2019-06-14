@@ -3,7 +3,7 @@ package com.storage.cameras.service;
 import com.storage.cameras.dao.CameraDao;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.rest.CameraResource;
-import com.storage.cameras.rest.CameraToResourceMapper;
+import com.storage.cameras.mapper.CameraToResourceMapper;
 import com.storage.cameras.rest.PostCameraParams;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;

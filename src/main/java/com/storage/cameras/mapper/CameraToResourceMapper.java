@@ -1,6 +1,7 @@
-package com.storage.cameras.rest;
+package com.storage.cameras.mapper;
 
 import com.storage.cameras.model.Camera;
+import com.storage.cameras.rest.CameraResource;
 
 import static com.storage.cameras.util.DateTimeUtil.formatDate;
 

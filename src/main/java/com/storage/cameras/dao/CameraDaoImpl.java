@@ -1,17 +1,16 @@
 package com.storage.cameras.dao;
 
+import com.storage.cameras.mapper.PostCameraParamsToCameraMapper;
 import com.storage.cameras.model.Camera;
-import com.storage.cameras.model.CameraStatus;
 import com.storage.cameras.rest.PostCameraParams;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.Optional;
 
-import static com.storage.cameras.util.DateTimeUtil.formatString;
+import static com.storage.cameras.mapper.PostCameraParamsToCameraMapper.INSTANCE;
 import static java.util.Optional.empty;
 import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
@@ -20,31 +19,14 @@ import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 @AllArgsConstructor
 public class CameraDaoImpl implements CameraDao {
     private final DataJpaCameraRepository dataJpaCameraRepository;
+    private static final PostCameraParamsToCameraMapper mapper = INSTANCE;
 
     @Override
     @Transactional(propagation = MANDATORY)
     public Camera updateOrCreateCamera(final PostCameraParams params) {
         return getByUrl(params.getUrl())
-                .map(camera -> {
-                    camera.setStatus(params.getStatus());
-                    camera.setIsp(params.getIsp());
-                    camera.setCountryCode(params.getCountryCode());
-                    camera.setCountryName(params.getCountryName());
-                    camera.setCity(params.getCity());
-                    camera.setUpdateTimestamp(new Date());
-                    return dataJpaCameraRepository.save(camera);
-                })
-                .orElseGet(() -> {
-                    final Camera newCamera = new Camera();
-                    newCamera.setCreationTimestamp(formatString(params.getTimestamp()));
-                    newCamera.setStatus(params.getStatus());
-                    newCamera.setUrl(params.getUrl());
-                    newCamera.setCity(params.getCity());
-                    newCamera.setCountryCode(params.getCountryCode());
-                    newCamera.setCountryName(params.getCountryName());
-                    newCamera.setIsp(params.getIsp());
-                    return dataJpaCameraRepository.save(newCamera);
-                });
+                .map(camera -> dataJpaCameraRepository.save(mapper.toUpdatedCamera(camera, params)))
+                .orElseGet(() -> dataJpaCameraRepository.save(mapper.toNewCamera(params)));
     }
 
     @Override
