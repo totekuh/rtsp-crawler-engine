@@ -33,7 +33,6 @@ def do_masscan(ip_range, aggressive=False):
     command = f'masscan {ip_range} -p{port} -oJ ./{masscan_result_file} --rate {rate}'
     print('Starting a masscan')
     if ';' in command or '&' in command or '|' in command or '#' in command:
-        print(command)
         raise Exception("I can break rules, too. Goodbye")
     try:
         subprocess.check_call(command.split(' '))
