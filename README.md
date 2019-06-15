@@ -26,3 +26,37 @@ torify ./rtsp_probe.py --batch-list masscan_results.txt --output probe_result.js
 
 # You can use rtsp_probe.py to continuously stream a single camera:
 torify ./rtsp_probe.py --url rtsp://10.10.10.10:554 --stream
+
+
+
+#Backend API:
+<b>Use this URL with a rtsp prober to store the results</b>
+POST /cameras/import
+{
+ "@timestamp": "yyyy-mm-dd hh:mm:ss"
+  "status": "UNCONNECTED";
+  "url": "rtsp://10.10.10.10:554";
+}
+
+GET /cameras/?id=1
+{
+  "cameraId": 1,
+  "rtspUrl": "rtsp://82.209.221.80:554",
+  "creationTimestamp": "2019-00-03 12:00:00",
+  "lastUpdateTimestamp": "2019-03-14 07:03:02",
+  "status": "UNAUTHORIZED",
+  "countryName": null,
+  "city": null
+}
+
+
+GET /cameras/?rtspUrl="rtsp://82.209.221.80:554"
+{
+  "cameraId": 1,
+  "rtspUrl": "rtsp://82.209.221.80:554",
+  "creationTimestamp": "2019-00-03 12:00:00",
+  "lastUpdateTimestamp": "2019-03-14 07:03:02",
+  "status": "UNAUTHORIZED",
+  "countryName": null,
+  "city": null
+}
