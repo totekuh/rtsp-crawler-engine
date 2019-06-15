@@ -1,5 +1,4 @@
 # rtsp-crawler-engine
-A platform to locate and probe RTSP streams
 
 # IMPORTANT! RTSP probing is running through a tor proxy, you should probably do the same.
 # IMPORTANT! If you are using a masscan to locate the streams, please note that masscan is using it's own TCP/IP stack, so it will ignore your proxy. To avoid this and keep your anonymity safe, you can try to init your scans via VPN connection with packets masquerading.
