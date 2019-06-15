@@ -4,7 +4,7 @@
 add-apt-repository ppa:webupd8team/java &&
 apt update &&
 
-apt install python3 python3-pip oracle-java8-installer maven mariadb-server tor mariadb-client &&
+apt install python3 python3-pip openjdk-8-jre maven mariadb-server tor mariadb-client &&
 pip3 install requests flask opencv-python
 
 # db initialization:
