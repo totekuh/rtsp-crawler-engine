@@ -16,8 +16,6 @@ public class PostCameraParams {
 
     private String url;
 
-    private boolean connectionEstablished;
-
     private String city;
 
     private String countryCode;

@@ -5,14 +5,14 @@ import com.storage.cameras.rest.PostCameraParams;
 
 import java.util.Date;
 
-import static com.storage.cameras.util.DateTimeUtil.formatString;
+import static com.storage.cameras.util.DateTimeUtil.formatStringWithDate;
 
 public interface PostCameraParamsToCameraMapper {
     PostCameraParamsToCameraMapper INSTANCE = new PostCameraParamsToCameraMapper() {
         @Override
         public Camera toNewCamera(final PostCameraParams params) {
             final Camera newCamera = new Camera();
-            newCamera.setCreationTimestamp(formatString(params.getTimestamp()));
+            newCamera.setCreationTimestamp(formatStringWithDate(params.getTimestamp()));
             newCamera.setStatus(params.getStatus());
             newCamera.setUrl(params.getUrl());
             newCamera.setCity(params.getCity());

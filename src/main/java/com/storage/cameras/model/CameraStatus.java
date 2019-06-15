@@ -7,12 +7,12 @@ public enum CameraStatus {
     OPEN,
 
     /**
-     * RTSP stream is exists, but there are no valid credentials.
+     * RTSP stream is exist, but there are no valid credentials.
      */
     UNAUTHORIZED,
 
     /**
-     * RTSP stream is exists, but an actual url was not found.
+     * RTSP stream is exist, but an actual url was not found.
      */
     NOT_FOUND,
 
@@ -20,5 +20,5 @@ public enum CameraStatus {
      * RTSP connection cannot be established or stream does not exist.
      * Cameras with this status should not present for a long time in the database and must be deleted at some point.
      */
-    CONNECTION_REFUSED;
+    UNCONNECTED;
 }

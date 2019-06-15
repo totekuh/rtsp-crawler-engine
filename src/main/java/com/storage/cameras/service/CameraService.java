@@ -1,6 +1,6 @@
 package com.storage.cameras.service;
 
-import com.storage.cameras.rest.CameraResource;
+import com.storage.cameras.rest.resource.CameraResource;
 import com.storage.cameras.rest.PostCameraParams;
 import javassist.NotFoundException;
 

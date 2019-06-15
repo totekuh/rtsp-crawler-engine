@@ -1,4 +1,4 @@
-package com.storage.cameras.rest;
+package com.storage.cameras.rest.resource;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
