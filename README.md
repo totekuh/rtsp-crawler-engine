@@ -1,7 +1,7 @@
 # rtsp-crawler-engine
 
-# IMPORTANT! RTSP probing is running through a tor proxy, you should probably do the same.
-# IMPORTANT! If you are using a masscan to locate the streams, please note that masscan is using it's own TCP/IP stack, so it will ignore your proxy. To avoid this and keep your anonymity safe, you can try to init your scans via VPN connection with packets masquerading.
+<h2>IMPORTANT! RTSP probing is running through a tor proxy, you should probably do the same.</h2>
+<h2>IMPORTANT! If you are using a masscan to locate the streams, please note that masscan is using it's own TCP/IP stack, so it will ignore your proxy. To avoid this and keep your anonymity safe, you can try to init your scans via VPN connection with packets masquerading.</h2>
 
 # There are different ways to obtain the cameras:
 # 1. blindly scan the internet and locate open streams:
