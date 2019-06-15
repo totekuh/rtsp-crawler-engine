@@ -3,9 +3,8 @@
 <h3>IMPORTANT! RTSP probing is running through a tor proxy, you should probably do the same.</h3>
 <h3>IMPORTANT! If you are using a masscan to locate the streams, please note that masscan is using it's own TCP/IP stack, so it will ignore your proxy. To avoid this and keep your anonymity safe, you can try to init your scans via VPN connection with packets masquerading.</h3>
 
-# Crawlers lifecycly is described here, the backend API is comming bellow.
 
-# There are different ways to obtain the cameras:
+<h2> There are different ways to obtain the cameras: </h2>
 # 1. blindly scan the internet and locate open streams:
 ./masscan_to_rtsp.py --masscan 10.0.0.0/8 --output masscan_results.txt
 # 1.1 do an aggressive scan:
