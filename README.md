@@ -13,10 +13,11 @@
 torify ./rtsp_probe.py --batch-list masscan_results.txt --output probe_result.json
 
 
-# 2. Get the cameras from the Shodan API and feed them into the crawler. You should be a member of Shodan to export their results.
+<h2> 2. Get the cameras from the Shodan API and feed them into the crawler. You should be a member of Shodan to export their results.</h2>
 
 # 2.1 consume the shodan JSON export to extract and probe cameras:
 torify ./rtsp_probe.py --batch-json shodan-export.json --output probe_result.json
+
 
 # 3 stream retrieved cameras to the backend API:
 torify ./rtsp_probe.py --batch-list masscan_results.txt --output probe_result.json --import http://localhost/camera/stream
