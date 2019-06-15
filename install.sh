@@ -1,6 +1,9 @@
 #!/bin/bash
 
-apt install python3 python3-pip java mvn mariadb tor
+# add java repository
+add-apt-repository ppa:webupd8team/java
+
+apt install python3 python3-pip oracle-java8-installer mvn mariadb-server tor
 pip3 install requests flask opencv-python
 
 # db initialization:
