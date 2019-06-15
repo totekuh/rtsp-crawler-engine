@@ -11,3 +11,11 @@ pip3 install requests flask opencv-python
 #CREATE DATABASE cameras_db;
 #CREATE USER rtsp@localhost IDENTIFIED BY 'changeme3';
 #GRANT ALL PRIVILEGES ON cameras_db.* TO rtsp@localhost IDENTIFIED BY 'changeme3';
+
+# configuring tor proxies to allow localhost:
+# nano /etc/tor/torsocks.conf
+
+# Set Torsocks to allow outbound connections to the loopback interface.
+# If set to 1, connect() will be allowed to be used to the loopback interface
+# bypassing Tor. This option should not be used by most users. (Default: 0)
+#AllowOutboundLocalhost 1
