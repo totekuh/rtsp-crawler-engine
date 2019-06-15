@@ -4,7 +4,6 @@
 import json
 from datetime import datetime
 from enum import Enum
-import socks
 
 import cv2
 
