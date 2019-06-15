@@ -1,3 +1,0 @@
-CREATE DATABASE cameras_db;
-CREATE USER rtsp@localhost IDENTIFIED BY 'changeme3';
-GRANT ALL PRIVILEGES ON cameras_db.* TO rtsp@localhost IDENTIFIED BY 'changeme3';
