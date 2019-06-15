@@ -27,36 +27,35 @@ torify ./rtsp_probe.py --batch-list masscan_results.txt --output probe_result.js
 # You can use rtsp_probe.py to continuously stream a single camera:
 torify ./rtsp_probe.py --url rtsp://10.10.10.10:554 --stream
 
-
-
+</br></br>
 #Backend API:
-<b>Use this URL with a rtsp prober to store the results</b>
-POST /cameras/import
-{
- "@timestamp": "yyyy-mm-dd hh:mm:ss"
-  "status": "UNCONNECTED";
-  "url": "rtsp://10.10.10.10:554";
-}
+</br><b>Use this URL with a rtsp prober to store the results</b>
+</br>POST /cameras/import
+</br>{
+</br> "@timestamp": "yyyy-mm-dd hh:mm:ss"
+</br>  "status": "UNCONNECTED";
+</br>  "url": "rtsp://10.10.10.10:554";
+</br>}
+</br>
+</br>GET /cameras/?id=1
+</br>{
+</br>  "cameraId": 1,
+</br>  "rtspUrl": "rtsp://82.209.221.80:554",
+</br>  "creationTimestamp": "2019-00-03 12:00:00",
+</br>  "lastUpdateTimestamp": "2019-03-14 07:03:02",
+</br>  "status": "UNAUTHORIZED",
+</br>  "countryName": null,
+</br>  "city": null
+</br>}
 
-GET /cameras/?id=1
-{
-  "cameraId": 1,
-  "rtspUrl": "rtsp://82.209.221.80:554",
-  "creationTimestamp": "2019-00-03 12:00:00",
-  "lastUpdateTimestamp": "2019-03-14 07:03:02",
-  "status": "UNAUTHORIZED",
-  "countryName": null,
-  "city": null
-}
-
-
-GET /cameras/?rtspUrl="rtsp://82.209.221.80:554"
-{
-  "cameraId": 1,
-  "rtspUrl": "rtsp://82.209.221.80:554",
-  "creationTimestamp": "2019-00-03 12:00:00",
-  "lastUpdateTimestamp": "2019-03-14 07:03:02",
-  "status": "UNAUTHORIZED",
-  "countryName": null,
-  "city": null
-}
+</br>
+</br>GET /cameras/?rtspUrl="rtsp://82.209.221.80:554"
+</br>{
+  </br>"cameraId": 1,
+  </br>"rtspUrl": "rtsp://82.209.221.80:554",
+  </br>"creationTimestamp": "2019-00-03 12:00:00",
+  </br>"lastUpdateTimestamp": "2019-03-14 07:03:02",
+  </br>"status": "UNAUTHORIZED",
+  </br>"countryName": null,
+  </br>"city": null
+</br>}
