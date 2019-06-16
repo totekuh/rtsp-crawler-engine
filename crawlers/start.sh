@@ -3,6 +3,9 @@
 # IMPORTANT! RTSP probing is running through a tor proxy, you should probably do the same.
 service tor start
 
+# set up the backend API endpoint to store a probe:
+api_endpoint=http://localhost:8080/cameras/import
+
 # There are different ways to obtain the cameras:
 # 1. blindly scan the internet and locate open streams:
 # IMPORTANT! If you are using a masscan to locate the streams, please note that masscan is using it's own TCP/IP stack, so it will ignore your proxy. To avoid this and keep your anonymity safe, you can try to init your scans via VPN connection with packets masquerading.
@@ -11,8 +14,10 @@ service tor start
 #./masscan_to_rtsp.py --masscan 10.0.0.0/8 --aggressive --output masscan_results.txt
 
 # 1.2 probe the results
-torify ./rtsp_probe.py --batch-list masscan_results.txt --output probe_result.json
+#torify ./rtsp_probe.py --batch-list masscan_results.txt --output probe_result.json
 
+# 1.2.1 probe the results and stream the results to the backend API:
+torify ./rtsp_probe.py --batch-list masscan_results.txt --import $api_endpoint
 
 # 2. Get the cameras from the Shodan API and feed them into the crawler. You should be a member of Shodan to export their results.
 
