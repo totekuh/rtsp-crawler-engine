@@ -67,7 +67,7 @@ class RtspClient:
         def to_dict(self):
             target = \
                 {
-                    '@timestamp': datetime.now().strftime(DEFAULT_DATETIME_FORMAT),
+                    # '@timestamp': datetime.now().strftime(DEFAULT_DATETIME_FORMAT),
                     'url': self.url,
                     'status': self.status.name,
                     'countryCode': self.country_code,

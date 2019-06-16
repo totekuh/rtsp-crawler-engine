@@ -12,10 +12,6 @@ import static com.storage.cameras.model.Camera.MAX_COMMENT_LENGTH;
 @Data
 public class PostCameraParams {
 
-    @NonNull
-    @JsonProperty("@timestamp")
-    private String timestamp;
-
     private CameraStatus status;
 
     @Size(max = MAX_COMMENT_LENGTH)
