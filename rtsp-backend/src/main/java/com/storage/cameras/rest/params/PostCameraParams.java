@@ -5,6 +5,10 @@ import com.storage.cameras.model.CameraStatus;
 import lombok.Data;
 import org.springframework.lang.NonNull;
 
+import javax.validation.constraints.Size;
+
+import static com.storage.cameras.model.Camera.MAX_COMMENT_LENGTH;
+
 @Data
 public class PostCameraParams {
 
@@ -13,6 +17,9 @@ public class PostCameraParams {
     private String timestamp;
 
     private CameraStatus status;
+
+    @Size(max = MAX_COMMENT_LENGTH)
+    private String comment;
 
     private String url;
 

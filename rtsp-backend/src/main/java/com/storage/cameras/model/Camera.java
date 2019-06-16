@@ -14,6 +14,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name = "camera")
 public class Camera {
+    public static final int MAX_COMMENT_LENGTH = 200;
     private static final int MAX_CAMERA_URL_LENGTH = 50;
     private static final int MAX_CITY_NAME_LENGTH = 255;
     private static final int MAX_COUNTRY_CODE_LENGTH = 10;
@@ -40,6 +41,9 @@ public class Camera {
 
     @Column(name = "city", length = MAX_CITY_NAME_LENGTH)
     private String city;
+
+    @Column(name = "comment", length = MAX_COMMENT_LENGTH)
+    private String comment;
 
     @Column(name = "country_code", length = MAX_COUNTRY_CODE_LENGTH)
     private String countryCode;

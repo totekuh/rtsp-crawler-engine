@@ -19,6 +19,7 @@ public interface PostCameraParamsToCameraMapper {
             newCamera.setCountryCode(params.getCountryCode());
             newCamera.setCountryName(params.getCountryName());
             newCamera.setIsp(params.getIsp());
+            newCamera.setComment(params.getComment());
             return newCamera;
         }
 
@@ -30,6 +31,7 @@ public interface PostCameraParamsToCameraMapper {
             camera.setCountryName(params.getCountryName());
             camera.setCity(params.getCity());
             camera.setUpdateTimestamp(new Date());
+            camera.setComment(params.getComment());
             return camera;
         }
     };

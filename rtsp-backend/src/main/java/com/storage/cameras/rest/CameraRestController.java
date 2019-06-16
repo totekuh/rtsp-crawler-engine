@@ -2,6 +2,7 @@ package com.storage.cameras.rest;
 
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
+import com.storage.cameras.rest.resource.CameraResource;
 import com.storage.cameras.rest.resource.CameraResourceContainer;
 import com.storage.cameras.service.CameraService;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static com.storage.cameras.model.RequestPath.CAMERAS_URL;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -43,13 +46,15 @@ public class CameraRestController {
             log.info("Get a camera: {}", rtspUrl);
             return ok(cameraService.get(rtspUrl));
         }
-        return ok(new CameraResourceContainer(cameraService.getAll()));
+        final List<CameraResource> cameras = cameraService.getAll();
+        return ok(new CameraResourceContainer(cameras.size(), cameras));
     }
 
     @SneakyThrows
     @PostMapping(value = "/search", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity search(@RequestBody @Valid SearchCameraParams params) {
         new SearchCameraParamsValidator(params).validate();
-        return ok(new CameraResourceContainer(cameraService.search(params)));
+        final List<CameraResource> cameras = cameraService.search(params);
+        return ok(new CameraResourceContainer(cameras.size(), cameras));
     }
 }

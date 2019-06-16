@@ -11,6 +11,8 @@ public class CameraResource {
 
     private final String rtspUrl;
 
+    private String comment;
+
     private String creationTimestamp;
 
     private String lastUpdateTimestamp;

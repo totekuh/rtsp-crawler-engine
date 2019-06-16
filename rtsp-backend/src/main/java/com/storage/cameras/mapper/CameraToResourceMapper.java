@@ -9,6 +9,7 @@ public interface CameraToResourceMapper {
     CameraToResourceMapper INSTANCE = camera -> new CameraResource(
             camera.getId(),
             camera.getUrl(),
+            camera.getComment(),
             formatDateToString(camera.getCreationTimestamp()),
             formatDateToString(camera.getUpdateTimestamp()),
             camera.getStatus().name(),
