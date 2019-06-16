@@ -4,6 +4,7 @@ import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
 import com.storage.cameras.rest.resource.CameraResource;
 import com.storage.cameras.rest.resource.CameraResourceContainer;
+import com.storage.cameras.rest.validator.SearchCameraParamsValidator;
 import com.storage.cameras.service.CameraService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;

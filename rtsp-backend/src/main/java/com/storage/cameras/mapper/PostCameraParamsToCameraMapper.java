@@ -5,7 +5,7 @@ import com.storage.cameras.rest.params.PostCameraParams;
 
 import java.util.Date;
 
-import static com.storage.cameras.util.DateTimeUtil.formatStringWithDate;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public interface PostCameraParamsToCameraMapper {
     PostCameraParamsToCameraMapper INSTANCE = new PostCameraParamsToCameraMapper() {
@@ -25,13 +25,25 @@ public interface PostCameraParamsToCameraMapper {
 
         @Override
         public Camera toUpdatedCamera(final Camera camera, final PostCameraParams params) {
-            camera.setStatus(params.getStatus());
-            camera.setIsp(params.getIsp());
-            camera.setCountryCode(params.getCountryCode());
-            camera.setCountryName(params.getCountryName());
-            camera.setCity(params.getCity());
+            if (params.getStatus() != null) {
+                camera.setStatus(params.getStatus());
+            }
+            if (isNotBlank(params.getIsp())) {
+                camera.setIsp(params.getIsp());
+            }
+            if (isNotBlank(params.getCountryCode())) {
+                camera.setCountryCode(params.getCountryCode());
+            }
+            if (isNotBlank(params.getCountryName())) {
+                camera.setCountryCode(params.getCountryName());
+            }
+            if (isNotBlank(params.getCity())) {
+                camera.setCountryCode(params.getCity());
+            }
             camera.setUpdateTimestamp(new Date());
-            camera.setComment(params.getComment());
+            if (isNotBlank(params.getComment())) {
+                camera.setComment(params.getComment());
+            }
             return camera;
         }
     };

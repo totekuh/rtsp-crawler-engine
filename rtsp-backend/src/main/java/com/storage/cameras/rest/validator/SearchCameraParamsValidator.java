@@ -1,4 +1,4 @@
-package com.storage.cameras.rest;
+package com.storage.cameras.rest.validator;
 
 import com.storage.cameras.exception.BadRequestException;
 import com.storage.cameras.model.CameraStatus;
