@@ -12,7 +12,7 @@ public interface PostCameraParamsToCameraMapper {
         @Override
         public Camera toNewCamera(final PostCameraParams params) {
             final Camera newCamera = new Camera();
-            newCamera.setCreationTimestamp(formatStringWithDate(params.getTimestamp()));
+            newCamera.setCreationTimestamp(new Date());
             newCamera.setStatus(params.getStatus());
             newCamera.setUrl(params.getUrl());
             newCamera.setCity(params.getCity());
