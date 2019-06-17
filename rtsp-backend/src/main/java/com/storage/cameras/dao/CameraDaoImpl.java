@@ -61,9 +61,13 @@ public class CameraDaoImpl implements CameraDao {
     public List<Camera> search(SearchCameraParams params) {
         final CameraStatus status = CameraStatus.valueOf(params.getStatus());
         final String countryCode = params.getCountryCode();
+        final String city = params.getCity();
 
         if (isNotBlank(countryCode)) {
             return dataJpaCameraRepository.findAllByStatusAndCountryCode(status, countryCode);
+        }
+        if (isNotBlank(city)) {
+            return dataJpaCameraRepository.findAllByStatusAndCity(status, city);
         }
         return dataJpaCameraRepository.findAllByStatus(status);
     }

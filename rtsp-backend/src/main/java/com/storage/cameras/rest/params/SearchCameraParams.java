@@ -14,4 +14,7 @@ public class SearchCameraParams {
     @Size(max = 2)
     private String countryCode;
 
+    @Size(max = 30)
+    private String city;
+
 }

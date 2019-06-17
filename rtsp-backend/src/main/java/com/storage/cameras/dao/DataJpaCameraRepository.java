@@ -20,4 +20,5 @@ public interface DataJpaCameraRepository extends JpaRepository<Camera, Long> {
     List<Camera> findAllByStatusAndCountryCode(CameraStatus status, String countryCode);
 
 
+    List<Camera> findAllByStatusAndCity(CameraStatus status, String city);
 }
