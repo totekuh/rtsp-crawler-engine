@@ -2,10 +2,12 @@ package com.storage.cameras.rest.validator;
 
 import com.storage.cameras.exception.BadRequestException;
 import com.storage.cameras.model.CameraStatus;
+import com.storage.cameras.model.Keyword;
 import com.storage.cameras.rest.params.SearchCameraParams;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -27,7 +29,17 @@ public class SearchCameraParamsValidator {
                     "Should be one of the following: %s", asList(CameraStatus.values())));
         }
         if (isNotBlank(params.getCountryCode()) && params.getCountryCode().length() != 2) {
-            throw new BadRequestException(format("Illegal 'countryCode' value. It should have a length of 2 chars"));
+            throw new BadRequestException("Illegal 'countryCode' value. It should have a length of 2 chars");
+        }
+
+        if (isNotEmpty(params.getKeywords())) {
+            for (final String keyword : params.getKeywords()) {
+                try {
+                    Keyword.valueOf(keyword);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

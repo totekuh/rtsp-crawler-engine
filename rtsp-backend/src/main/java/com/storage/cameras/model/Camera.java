@@ -4,12 +4,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.toSet;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Getter
 @Setter
@@ -53,6 +57,9 @@ public class Camera {
     @Column(name = "isp", length = MAX_ISP_LENGTH)
     private String isp;
 
+    @Column(name = "keywords")
+    private String keywords;
+
     @OneToMany(mappedBy = "camera")
     private Set<Comment> comments = new HashSet<>();
 
@@ -66,9 +73,31 @@ public class Camera {
         this.updateTimestamp = new Date();
     }
 
-    public boolean isNewlyCreated() {
-        return id == null;
+    public Set<Keyword> getKeywords() {
+        if (isBlank(keywords)) {
+            return emptySet();
+        }
+        return Arrays.stream(keywords.split(","))
+                .map(Keyword::valueOf)
+                .collect(toSet());
     }
+
+    public void addKeyword(final List<String> keywords) {
+        System.out.println(keywords);
+        System.out.println(this.keywords);
+        if (isNotEmpty(keywords)) {
+            for (final String k : keywords) {
+                if (isBlank(this.keywords)) {
+                    this.keywords = k;
+                } else {
+                    if (!this.keywords.contains(k)) {
+                        this.keywords += format(",%s", k);
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 

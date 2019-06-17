@@ -1,10 +1,9 @@
 package com.storage.cameras.dao;
 
-import com.storage.cameras.exception.BadRequestException;
 import com.storage.cameras.mapper.PostCameraParamsToCameraMapper;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.CameraStatus;
-import com.storage.cameras.model.Comment;
+import com.storage.cameras.model.Keyword;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
 import lombok.AllArgsConstructor;
@@ -12,13 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static com.storage.cameras.mapper.PostCameraParamsToCameraMapper.INSTANCE;
-import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
@@ -63,13 +62,26 @@ public class CameraDaoImpl implements CameraDao {
         final String countryCode = params.getCountryCode();
         final String city = params.getCity();
 
+        final List<Camera> cameras;
         if (isNotBlank(countryCode)) {
-            return dataJpaCameraRepository.findAllByStatusAndCountryCode(status, countryCode);
+            cameras = dataJpaCameraRepository.findAllByStatusAndCountryCode(status, countryCode);
+        } else if (isNotBlank(city)) {
+            cameras = dataJpaCameraRepository.findAllByStatusAndCity(status, city);
+        } else {
+            cameras = dataJpaCameraRepository.findAllByStatus(status);
         }
-        if (isNotBlank(city)) {
-            return dataJpaCameraRepository.findAllByStatusAndCity(status, city);
+        if (isNotEmpty(params.getKeywords())) {
+            return cameras
+                    .stream()
+                    .filter(camera -> {
+                        for (final String keyword : params.getKeywords()) {
+                            return camera.getKeywords().contains(Keyword.valueOf(keyword));
+                        }
+                        return false;
+                    })
+                    .collect(toList());
         }
-        return dataJpaCameraRepository.findAllByStatus(status);
+        return cameras;
     }
 
     @Override

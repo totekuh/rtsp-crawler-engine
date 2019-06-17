@@ -7,6 +7,8 @@ import org.springframework.lang.NonNull;
 
 import javax.validation.constraints.Size;
 
+import java.util.List;
+
 import static com.storage.cameras.model.Camera.MAX_COMMENT_LENGTH;
 
 @Data
@@ -26,4 +28,6 @@ public class PostCameraParams {
     private String countryName;
 
     private String isp;
+
+    private List<String> keywords;
 }

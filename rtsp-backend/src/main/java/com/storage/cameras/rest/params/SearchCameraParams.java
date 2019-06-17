@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.validation.constraints.Size;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @AllArgsConstructor
@@ -16,5 +18,7 @@ public class SearchCameraParams {
 
     @Size(max = 30)
     private String city;
+
+    private Set<String> keywords;
 
 }

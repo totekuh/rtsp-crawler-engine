@@ -1,9 +1,11 @@
 package com.storage.cameras.rest.resource;
 
+import com.storage.cameras.model.Keyword;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @AllArgsConstructor
@@ -26,5 +28,7 @@ public class CameraResource {
     private final String countryCode;
 
     private final String city;
+
+    private Set<Keyword> keywords;
 
 }

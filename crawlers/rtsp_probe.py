@@ -30,6 +30,9 @@ def get_arguments():
     parser.add_argument('-c', '--commentary', action='store_true',
                         help='Optional. Make and submit a review comment for the watched stream. '
                              'Only valid with an option --stream')
+    parser.add_argument('-k', '--keywords', action='store_true',
+                        help='Optional. Send specified keywords to mark your camera. A set of keywords would be '
+                             'printed during camera lookup.')
     options = parser.parse_args()
     if not options.url and not options.batch_json_file and not options.batch_list_file:
         parser.error('URL to the RTSP stream or a batch json/list file must be specified. Use --help for more info.')
@@ -45,13 +48,23 @@ def get_arguments():
 
 
 class RtspClient:
-    def __init__(self, output_file, import_endpoint=None, do_review_comment=False):
+    def __init__(self, output_file, import_endpoint=None, do_review_comment=False, use_keywords=False):
         self.camera_reader = None
         self.output_file = output_file
         self.import_endpoint = import_endpoint
         self.do_review_comment = do_review_comment
+        self.use_keywords = use_keywords
 
     class Target:
+        class Keyword(Enum):
+            HOT = 0,
+            WOMAN = 1,
+            MAN = 2,
+            CHILDREN = 3,
+            CREEPY = 4,
+            AUTISTIC = 5,
+            SLAVERY = 6
+
         class CameraStatus(Enum):
             UNCONNECTED = 0,
             NOT_FOUND = 1,
@@ -69,16 +82,22 @@ class RtspClient:
             self.city = city
             self.status = self.CameraStatus.UNCONNECTED
             self.comment = comment
+            self.keywords = set()
+
+        def print_all_keywords(self):
+            print('Available keywords:')
+            for k in self.Keyword:
+                print(k.name)
 
         def to_dict(self):
             target = \
                 {
-                    # '@timestamp': datetime.now().strftime(DEFAULT_DATETIME_FORMAT),
                     'url': self.url,
                     'status': self.status.name,
                     'countryCode': self.country_code,
                     'countryName': self.country_name,
                     'comment': self.comment,
+                    'keywords': list(self.keywords),
                     'city': self.city,
                     'isp': self.isp
                 }
@@ -136,6 +155,14 @@ class RtspClient:
                 if self.do_review_comment:
                     print('How was that?')
                     target.comment = input('>>')
+                if self.use_keywords:
+                    target.print_all_keywords()
+                    print('\nMARK THIS SHIT:')
+                    k = input('>>')
+                    if ',' not in k:
+                        target.keywords.add(k)
+                    else:
+                        target.keywords.update(k.split(','))
         else:
             print('Connection failed.')
 
@@ -153,6 +180,7 @@ class RtspClient:
 
     def send(self, target):
         try:
+            print(target.keywords)
             import requests
             session = requests.Session()
             response = session.put(url=self.import_endpoint,
@@ -170,7 +198,11 @@ class RtspClient:
 
 options = get_arguments()
 
-rtsp_client = RtspClient(options.output, import_endpoint=options.import_url, do_review_comment=options.commentary)
+rtsp_client = RtspClient(
+    options.output,
+    import_endpoint=options.import_url,
+    do_review_comment=options.commentary,
+    use_keywords=options.keywords)
 if not options.url:
     if options.batch_json_file:
         rtsp_client.batch_json(options.batch_json_file)

@@ -18,7 +18,8 @@ public interface CameraToResourceMapper {
             camera.getStatus().name(),
             camera.getCountryName(),
             camera.getCountryCode(),
-            camera.getCity()
+            camera.getCity(),
+            camera.getKeywords()
     );
 
     CameraResource convert(Camera camera);
