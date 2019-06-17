@@ -43,7 +43,7 @@ public class CameraRestController {
             log.info("Get a camera: {}", rtspUrl);
             return ok(cameraService.get(rtspUrl));
         }
-        return ok(cameraService.getAll());
+        return ok(new CameraResourceContainer(cameraService.getAll()));
     }
 
     @SneakyThrows
