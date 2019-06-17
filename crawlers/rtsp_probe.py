@@ -1,9 +1,9 @@
 #!/usr/bin/python3.7
 
-
 import json
 from datetime import datetime
 from enum import Enum
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 import cv2
 
@@ -11,9 +11,7 @@ DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
 def get_arguments():
-    import argparse
-    from argparse import RawTextHelpFormatter
-    parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
+    parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument('-u', '--url', dest='url',
                         help='URL to rtsp stream to view. '
                              'Should be in the following format: "rtsp://115.21.242.154:554"')
