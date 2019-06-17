@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -42,9 +44,6 @@ public class Camera {
     @Column(name = "city", length = MAX_CITY_NAME_LENGTH)
     private String city;
 
-    @Column(name = "comment", length = MAX_COMMENT_LENGTH)
-    private String comment;
-
     @Column(name = "country_code", length = MAX_COUNTRY_CODE_LENGTH)
     private String countryCode;
 
@@ -53,6 +52,9 @@ public class Camera {
 
     @Column(name = "isp", length = MAX_ISP_LENGTH)
     private String isp;
+
+    @OneToMany(mappedBy = "camera")
+    private Set<Comment> comments = new HashSet<>();
 
     @PreUpdate
     public void updateTrigger() {

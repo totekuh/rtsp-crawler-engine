@@ -1,8 +1,10 @@
 package com.storage.cameras.service;
 
 import com.storage.cameras.dao.CameraDao;
+import com.storage.cameras.dao.CommentDao;
 import com.storage.cameras.mapper.CameraToResourceMapper;
 import com.storage.cameras.model.Camera;
+import com.storage.cameras.model.Comment;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.resource.CameraResource;
 import com.storage.cameras.rest.params.SearchCameraParams;
@@ -16,6 +18,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 
 @Service
@@ -24,11 +27,19 @@ import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 @Transactional(propagation = REQUIRED)
 public class CameraServiceImpl implements CameraService {
     private final CameraDao cameraDao;
+    private final CommentDao commentDao;
     private final CameraToResourceMapper mapper = CameraToResourceMapper.INSTANCE;
 
     @Override
     public CameraResource save(final PostCameraParams params) {
         final Camera camera = cameraDao.updateOrCreateCamera(params);
+        if (isNotBlank(params.getComment())) {
+            final Comment comment = new Comment();
+            comment.setComment(params.getComment());
+            camera.getComments().add(comment);
+            comment.setCamera(camera);
+            commentDao.save(comment);
+        }
         return mapper.convert(camera);
     }
 

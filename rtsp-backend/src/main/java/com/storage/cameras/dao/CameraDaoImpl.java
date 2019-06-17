@@ -4,6 +4,7 @@ import com.storage.cameras.exception.BadRequestException;
 import com.storage.cameras.mapper.PostCameraParamsToCameraMapper;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.CameraStatus;
+import com.storage.cameras.model.Comment;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
 import lombok.AllArgsConstructor;
@@ -32,7 +33,7 @@ public class CameraDaoImpl implements CameraDao {
     @Override
     public Camera updateOrCreateCamera(final PostCameraParams params) {
         return getByUrl(params.getUrl())
-                .map(camera -> dataJpaCameraRepository.save(mapper.toUpdatedCamera(camera, params)))
+                .map(c -> dataJpaCameraRepository.save(mapper.toUpdatedCamera(c, params)))
                 .orElseGet(() -> dataJpaCameraRepository.save(mapper.toNewCamera(params)));
     }
 

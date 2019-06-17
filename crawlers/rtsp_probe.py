@@ -1,9 +1,8 @@
 #!/usr/bin/python3.7
 
 import json
-from datetime import datetime
-from enum import Enum
 from argparse import ArgumentParser, RawTextHelpFormatter
+from enum import Enum
 
 import cv2
 
@@ -28,6 +27,9 @@ def get_arguments():
                         help='Optional. Output JSON file to store the results. Default file name is "prey.json".')
     parser.add_argument('-i', '--import', dest='import_url',
                         help='Optional. The import endpoint of the backend rest API to store probed cameras.')
+    parser.add_argument('-c', '--commentary', action='store_true',
+                        help='Optional. Make and submit a review comment for the watched stream. '
+                             'Only valid with an option --stream')
     options = parser.parse_args()
     if not options.url and not options.batch_json_file and not options.batch_list_file:
         parser.error('URL to the RTSP stream or a batch json/list file must be specified. Use --help for more info.')
@@ -37,14 +39,17 @@ def get_arguments():
         options.output = 'prey.json'
     if not options.import_url:
         print('The import endpoint was not provided, results would be written to a file.')
+    if options.commentary and not options.url and not options.stream:
+        parser.error('You can not specify an option for the stream review without a --stream option')
     return options
 
 
 class RtspClient:
-    def __init__(self, output_file, import_endpoint=None):
+    def __init__(self, output_file, import_endpoint=None, do_review_comment=False):
         self.camera_reader = None
         self.output_file = output_file
         self.import_endpoint = import_endpoint
+        self.do_review_comment = do_review_comment
 
     class Target:
         class CameraStatus(Enum):
@@ -54,7 +59,7 @@ class RtspClient:
             OPEN = 3
 
         def __init__(self, url, ip=None, port=None, country_name=None, isp=None, country_code=None,
-                     city=None):
+                     city=None, comment=None):
             self.url = url
             self.ip = ip
             self.port = port
@@ -63,6 +68,7 @@ class RtspClient:
             self.country_code = country_code
             self.city = city
             self.status = self.CameraStatus.UNCONNECTED
+            self.comment = comment
 
         def to_dict(self):
             target = \
@@ -72,6 +78,7 @@ class RtspClient:
                     'status': self.status.name,
                     'countryCode': self.country_code,
                     'countryName': self.country_name,
+                    'comment': self.comment,
                     'city': self.city,
                     'isp': self.isp
                 }
@@ -126,6 +133,9 @@ class RtspClient:
                     pressed_key = cv2.waitKey(1)
                     if pressed_key & 0xFF == ord("q"):  # Exit condition
                         break
+                if self.do_review_comment:
+                    print('How was that?')
+                    target.comment = input('>>')
         else:
             print('Connection failed.')
 
@@ -146,10 +156,10 @@ class RtspClient:
             import requests
             session = requests.Session()
             response = session.put(url=self.import_endpoint,
-                                    json=target.to_dict(),
-                                    headers={
-                                        "Content-Type": "application/json"
-                                    })
+                                   json=target.to_dict(),
+                                   headers={
+                                       "Content-Type": "application/json"
+                                   })
             print(f'Camera [{target.url}] import API response: \n{response.status_code}\n{response.text}')
         except Exception as e:
             if 'refused' in str(e):
@@ -160,7 +170,7 @@ class RtspClient:
 
 options = get_arguments()
 
-rtsp_client = RtspClient(options.output, import_endpoint=options.import_url)
+rtsp_client = RtspClient(options.output, import_endpoint=options.import_url, do_review_comment=options.commentary)
 if not options.url:
     if options.batch_json_file:
         rtsp_client.batch_json(options.batch_json_file)

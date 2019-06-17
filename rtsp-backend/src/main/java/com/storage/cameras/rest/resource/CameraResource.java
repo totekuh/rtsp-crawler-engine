@@ -3,6 +3,8 @@ package com.storage.cameras.rest.resource;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 public class CameraResource {
@@ -11,7 +13,7 @@ public class CameraResource {
 
     private final String rtspUrl;
 
-    private String comment;
+    private List<CommentResource> comments;
 
     private String creationTimestamp;
 
