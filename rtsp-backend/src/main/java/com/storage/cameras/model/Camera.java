@@ -83,8 +83,6 @@ public class Camera {
     }
 
     public void addKeyword(final List<String> keywords) {
-        System.out.println(keywords);
-        System.out.println(this.keywords);
         if (isNotEmpty(keywords)) {
             for (final String k : keywords) {
                 if (isBlank(this.keywords)) {

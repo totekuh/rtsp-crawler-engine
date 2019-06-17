@@ -180,7 +180,6 @@ class RtspClient:
 
     def send(self, target):
         try:
-            print(target.keywords)
             import requests
             session = requests.Session()
             response = session.put(url=self.import_endpoint,
