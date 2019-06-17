@@ -1,7 +1,7 @@
 package com.storage.cameras.mapper;
 
 import com.storage.cameras.model.Camera;
-import com.storage.cameras.rest.PostCameraParams;
+import com.storage.cameras.rest.params.PostCameraParams;
 
 import java.util.Date;
 

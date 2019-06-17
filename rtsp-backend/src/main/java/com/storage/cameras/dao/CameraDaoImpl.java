@@ -1,28 +1,35 @@
 package com.storage.cameras.dao;
 
+import com.storage.cameras.exception.BadRequestException;
 import com.storage.cameras.mapper.PostCameraParamsToCameraMapper;
 import com.storage.cameras.model.Camera;
-import com.storage.cameras.rest.PostCameraParams;
+import com.storage.cameras.model.CameraStatus;
+import com.storage.cameras.rest.params.PostCameraParams;
+import com.storage.cameras.rest.params.SearchCameraParams;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.storage.cameras.mapper.PostCameraParamsToCameraMapper.INSTANCE;
+import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
 @Slf4j
 @Repository
 @AllArgsConstructor
+@Transactional(propagation = MANDATORY)
 public class CameraDaoImpl implements CameraDao {
     private final DataJpaCameraRepository dataJpaCameraRepository;
     private static final PostCameraParamsToCameraMapper mapper = INSTANCE;
 
     @Override
-    @Transactional(propagation = MANDATORY)
     public Camera updateOrCreateCamera(final PostCameraParams params) {
         return getByUrl(params.getUrl())
                 .map(camera -> dataJpaCameraRepository.save(mapper.toUpdatedCamera(camera, params)))
@@ -47,5 +54,21 @@ public class CameraDaoImpl implements CameraDao {
             log.error("Unexpected error: ", e);
             return empty();
         }
+    }
+
+    @Override
+    public List<Camera> search(SearchCameraParams params) {
+        final CameraStatus status = CameraStatus.valueOf(params.getStatus());
+        final String countryCode = params.getCountryCode();
+
+        if (isNotBlank(countryCode)) {
+            return dataJpaCameraRepository.findAllByStatusAndCountryCode(status, countryCode);
+        }
+        return dataJpaCameraRepository.findAllByStatus(status);
+    }
+
+    @Override
+    public List<Camera> getAll() {
+        return dataJpaCameraRepository.findAll();
     }
 }

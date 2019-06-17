@@ -21,4 +21,5 @@ public enum CameraStatus {
      * Cameras with this status should not present for a long time in the database and must be deleted at some point.
      */
     UNCONNECTED;
+
 }

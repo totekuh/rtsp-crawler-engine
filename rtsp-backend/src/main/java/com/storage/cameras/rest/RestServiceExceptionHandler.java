@@ -1,5 +1,6 @@
 package com.storage.cameras.rest;
 
+import com.storage.cameras.exception.BadRequestException;
 import com.storage.cameras.rest.resource.ErrorMessage;
 import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,11 @@ public class RestServiceExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity handleNotFoundException(final NotFoundException ex) {
         return responseMessage(NOT_FOUND, new ErrorMessage(ex.getMessage()));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity handleBadRequestException(final BadRequestException ex) {
+        return responseMessage(BAD_REQUEST, new ErrorMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

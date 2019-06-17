@@ -1,4 +1,4 @@
-package com.storage.cameras.rest;
+package com.storage.cameras.rest.params;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.storage.cameras.model.CameraStatus;

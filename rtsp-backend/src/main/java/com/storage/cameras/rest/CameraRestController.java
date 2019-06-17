@@ -1,5 +1,8 @@
 package com.storage.cameras.rest;
 
+import com.storage.cameras.rest.params.PostCameraParams;
+import com.storage.cameras.rest.params.SearchCameraParams;
+import com.storage.cameras.rest.resource.CameraResourceContainer;
 import com.storage.cameras.service.CameraService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -7,10 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import static com.storage.cameras.model.RequestPath.CAMERAS_URL;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -21,14 +25,14 @@ public class CameraRestController {
 
     private final CameraService cameraService;
 
-    @PutMapping(value = "/import", consumes = APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/import", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity receive(@RequestBody final PostCameraParams params) {
         log.info("Import a camera: {}", params.getUrl());
         return ok(cameraService.save(params));
     }
 
     @SneakyThrows
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity get(@RequestParam(required = false) final Long id,
                               @RequestParam(required = false) final String rtspUrl) {
         if (id != null) {
@@ -39,7 +43,13 @@ public class CameraRestController {
             log.info("Get a camera: {}", rtspUrl);
             return ok(cameraService.get(rtspUrl));
         }
-        return badRequest().build();
+        return ok(cameraService.getAll());
     }
 
+    @SneakyThrows
+    @PostMapping(value = "/search", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity search(@RequestBody @Valid SearchCameraParams params) {
+        new SearchCameraParamsValidator(params).validate();
+        return ok(new CameraResourceContainer(cameraService.search(params)));
+    }
 }
