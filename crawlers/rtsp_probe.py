@@ -145,7 +145,7 @@ class RtspClient:
         try:
             import requests
             session = requests.Session()
-            response = session.post(url=self.import_endpoint,
+            response = session.put(url=self.import_endpoint,
                                     json=target.to_dict(),
                                     headers={
                                         "Content-Type": "application/json"

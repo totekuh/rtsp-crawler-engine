@@ -21,7 +21,7 @@ public class CameraRestController {
 
     private final CameraService cameraService;
 
-    @PostMapping(value = "/import", consumes = APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/import", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity receive(@RequestBody final PostCameraParams params) {
         log.info("Import a camera: {}", params.getUrl());
         return ok(cameraService.save(params));
