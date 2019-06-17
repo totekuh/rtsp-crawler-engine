@@ -23,6 +23,8 @@ public class CameraResource {
 
     private final String countryName;
 
+    private final String countryCode;
+
     private final String city;
 
 }

@@ -17,6 +17,7 @@ public interface CameraToResourceMapper {
             formatDateToString(camera.getUpdateTimestamp()),
             camera.getStatus().name(),
             camera.getCountryName(),
+            camera.getCountryCode(),
             camera.getCity()
     );
 
