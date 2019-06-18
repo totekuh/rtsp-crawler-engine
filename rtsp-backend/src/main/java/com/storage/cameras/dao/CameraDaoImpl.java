@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.storage.cameras.mapper.PostCameraParamsToCameraMapper.INSTANCE;
+import static com.storage.cameras.rest.params.SearchCameraParams.Order.*;
+import static java.util.Comparator.comparing;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -80,6 +82,32 @@ public class CameraDaoImpl implements CameraDao {
                         return false;
                     })
                     .collect(toList());
+        }
+
+        if (params.getOrder() != null) {
+            final SearchCameraParams.Order order = params.getOrder();
+            if (order == CREATION_TIMESTAMP_ASC) {
+                return cameras
+                        .stream()
+                        .sorted(comparing(Camera::getCreationTimestamp))
+                        .collect(toList());
+            } else if (order == CREATION_TIMESTAMP_DESC) {
+                return cameras
+                        .stream()
+                        .sorted(comparing(Camera::getCreationTimestamp).reversed())
+                        .collect(toList());
+            } else if (order == ID_ASC) {
+                return cameras
+                        .stream()
+                        .sorted(comparing(Camera::getId))
+                        .collect(toList());
+            } else if (order == ID_DESC) {
+                return cameras
+                        .stream()
+                        .sorted(comparing(Camera::getId).reversed())
+                        .collect(toList());
+            }
+
         }
         return cameras;
     }

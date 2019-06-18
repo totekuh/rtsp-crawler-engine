@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.validation.constraints.Size;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -20,5 +19,14 @@ public class SearchCameraParams {
     private String city;
 
     private Set<String> keywords;
+
+    private Order order;
+
+    public enum Order {
+        ID_ASC,
+        ID_DESC,
+        CREATION_TIMESTAMP_ASC,
+        CREATION_TIMESTAMP_DESC;
+    }
 
 }
