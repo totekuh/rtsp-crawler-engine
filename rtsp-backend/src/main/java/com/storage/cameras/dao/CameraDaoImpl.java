@@ -117,4 +117,19 @@ public class CameraDaoImpl implements CameraDao {
     public List<Camera> getAll() {
         return dataJpaCameraRepository.findAll();
     }
+
+    @Override
+    public void save(final Camera camera) {
+        dataJpaCameraRepository.save(camera);
+    }
+
+    @Override
+    public void save(final List<Camera> cameras) {
+        dataJpaCameraRepository.saveAll(cameras);
+    }
+
+    @Override
+    public List<Camera> findWithNoGeolocation() {
+        return dataJpaCameraRepository.findWithNoGeolocation();
+    }
 }

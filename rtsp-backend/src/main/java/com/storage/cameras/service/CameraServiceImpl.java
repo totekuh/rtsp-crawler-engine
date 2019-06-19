@@ -70,4 +70,19 @@ public class CameraServiceImpl implements CameraService {
                 .map(mapper::convert)
                 .collect(toList());
     }
+
+    @Override
+    public List<Camera> getWithNoGeolocation() {
+        return cameraDao.findWithNoGeolocation();
+    }
+
+    @Override
+    public void save(final Camera camera) {
+        cameraDao.save(camera);
+    }
+
+    @Override
+    public void save(final List<Camera> cameras) {
+        cameraDao.save(cameras);
+    }
 }

@@ -16,4 +16,10 @@ public interface CameraDao {
     List<Camera> search(SearchCameraParams params);
 
     List<Camera> getAll();
+
+    void save(Camera camera);
+
+    void save(List<Camera> cameras);
+
+    List<Camera> findWithNoGeolocation();
 }

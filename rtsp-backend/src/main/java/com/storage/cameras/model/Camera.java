@@ -23,6 +23,7 @@ import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Getter
 @Setter
@@ -105,4 +106,11 @@ public class Camera {
         }
     }
 
+    public boolean hasGeolocation() {
+        return isNotBlank(city) && isNotBlank(countryName) && isNotBlank(countryCode);
+    }
+
+    public String getIpAddress() {
+        return url.split("rtsp://")[1].split(":")[0];
+    }
 }
