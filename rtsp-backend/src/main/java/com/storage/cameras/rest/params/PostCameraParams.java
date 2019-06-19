@@ -1,14 +1,9 @@
 package com.storage.cameras.rest.params;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.storage.cameras.model.CameraStatus;
-import lombok.Data;
-import org.springframework.lang.NonNull;
-
-import javax.validation.constraints.Size;
-
 import java.util.List;
-
+import javax.validation.constraints.Size;
+import lombok.Data;
 import static com.storage.cameras.model.Camera.MAX_COMMENT_LENGTH;
 
 @Data

@@ -1,11 +1,10 @@
 package com.storage.cameras.rest.resource;
 
 import com.storage.cameras.model.Keyword;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.List;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
@@ -15,11 +14,11 @@ public class CameraResource {
 
     private final String rtspUrl;
 
-    private List<CommentResource> comments;
+    private final List<CommentResource> comments;
 
-    private String creationTimestamp;
+    private final String creationTimestamp;
 
-    private String lastUpdateTimestamp;
+    private final String lastUpdateTimestamp;
 
     private final String status;
 
@@ -29,6 +28,6 @@ public class CameraResource {
 
     private final String city;
 
-    private Set<Keyword> keywords;
+    private final Set<Keyword> keywords;
 
 }

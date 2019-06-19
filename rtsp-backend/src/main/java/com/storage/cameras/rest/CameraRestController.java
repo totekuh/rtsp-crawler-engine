@@ -7,15 +7,19 @@ import com.storage.cameras.rest.resource.CameraResourceContainer;
 import com.storage.cameras.rest.validator.PostCameraParamsValidator;
 import com.storage.cameras.rest.validator.SearchCameraParamsValidator;
 import com.storage.cameras.service.CameraService;
+import java.util.List;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.List;
-
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import static com.storage.cameras.model.RequestPath.CAMERAS_URL;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -39,7 +43,7 @@ public class CameraRestController {
     @SneakyThrows
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity get(@RequestParam(required = false) final Long id,
-                              @RequestParam(required = false) final String rtspUrl) {
+            @RequestParam(required = false) final String rtspUrl) {
         if (id != null) {
             log.info("Get a camera: {}", id);
             return ok(cameraService.get(id));

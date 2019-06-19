@@ -2,9 +2,6 @@ package com.storage.cameras.mapper;
 
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.rest.resource.CameraResource;
-
-import java.util.stream.Collectors;
-
 import static com.storage.cameras.util.DateTimeUtil.formatDateToString;
 import static java.util.stream.Collectors.toList;
 
@@ -19,8 +16,7 @@ public interface CameraToResourceMapper {
             camera.getCountryName(),
             camera.getCountryCode(),
             camera.getCity(),
-            camera.getKeywords()
-    );
+            camera.getKeywords());
 
     CameraResource convert(Camera camera);
 }

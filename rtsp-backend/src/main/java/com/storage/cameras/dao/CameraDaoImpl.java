@@ -6,16 +6,17 @@ import com.storage.cameras.model.CameraStatus;
 import com.storage.cameras.model.Keyword;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
+import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-
 import static com.storage.cameras.mapper.PostCameraParamsToCameraMapper.INSTANCE;
-import static com.storage.cameras.rest.params.SearchCameraParams.Order.*;
+import static com.storage.cameras.rest.params.SearchCameraParams.Order.CREATION_TIMESTAMP_ASC;
+import static com.storage.cameras.rest.params.SearchCameraParams.Order.CREATION_TIMESTAMP_DESC;
+import static com.storage.cameras.rest.params.SearchCameraParams.Order.ID_ASC;
+import static com.storage.cameras.rest.params.SearchCameraParams.Order.ID_DESC;
 import static java.util.Comparator.comparing;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
@@ -59,7 +60,7 @@ public class CameraDaoImpl implements CameraDao {
     }
 
     @Override
-    public List<Camera> search(SearchCameraParams params) {
+    public List<Camera> search(final SearchCameraParams params) {
         final CameraStatus status = CameraStatus.valueOf(params.getStatus());
         final String countryCode = params.getCountryCode();
         final String city = params.getCity();

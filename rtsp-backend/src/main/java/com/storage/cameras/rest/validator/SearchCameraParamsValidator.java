@@ -4,7 +4,6 @@ import com.storage.cameras.exception.BadRequestException;
 import com.storage.cameras.model.CameraStatus;
 import com.storage.cameras.model.Keyword;
 import com.storage.cameras.rest.params.SearchCameraParams;
-
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;

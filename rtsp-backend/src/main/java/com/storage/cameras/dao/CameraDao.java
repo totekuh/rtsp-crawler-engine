@@ -3,7 +3,6 @@ package com.storage.cameras.dao;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
-
 import java.util.List;
 import java.util.Optional;
 

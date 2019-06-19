@@ -4,10 +4,12 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import lombok.NoArgsConstructor;
+import static lombok.AccessLevel.PRIVATE;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public class DateTimeUtil {
+@NoArgsConstructor(access = PRIVATE)
+public final class DateTimeUtil {
 
     private final static String DEFAULT_DATETIME_FORMAT = "yyyy-mm-dd hh:mm:ss";
     private final static DateFormat DEFAULT_FORMATTER = new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);

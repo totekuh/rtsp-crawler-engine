@@ -2,9 +2,7 @@ package com.storage.cameras.mapper;
 
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.rest.params.PostCameraParams;
-
 import java.util.Date;
-
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public interface PostCameraParamsToCameraMapper {

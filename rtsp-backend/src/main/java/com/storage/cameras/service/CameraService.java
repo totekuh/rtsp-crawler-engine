@@ -1,12 +1,10 @@
 package com.storage.cameras.service;
 
-import com.storage.cameras.rest.resource.CameraResource;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
-import javassist.NotFoundException;
-import org.springframework.http.ResponseEntity;
-
+import com.storage.cameras.rest.resource.CameraResource;
 import java.util.List;
+import javassist.NotFoundException;
 
 public interface CameraService {
 

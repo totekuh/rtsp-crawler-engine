@@ -6,16 +6,14 @@ import com.storage.cameras.mapper.CameraToResourceMapper;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.Comment;
 import com.storage.cameras.rest.params.PostCameraParams;
-import com.storage.cameras.rest.resource.CameraResource;
 import com.storage.cameras.rest.params.SearchCameraParams;
+import com.storage.cameras.rest.resource.CameraResource;
+import java.util.List;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;

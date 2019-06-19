@@ -1,9 +1,9 @@
 package com.storage.cameras.background;
 
-import com.storage.cameras.dao.CameraDao;
-import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import com.storage.cameras.dao.CameraDao;
+import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor

@@ -1,14 +1,23 @@
 package com.storage.cameras.model;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.persistence.*;
-import java.util.*;
-
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -97,5 +106,3 @@ public class Camera {
     }
 
 }
-
-

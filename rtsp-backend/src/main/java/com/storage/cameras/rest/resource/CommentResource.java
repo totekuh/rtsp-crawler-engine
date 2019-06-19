@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CommentResource {
-    private String creationDate;
-    private String comment;
+    private final String creationDate;
+    private final String comment;
 }

@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.ResponseEntity.status;
@@ -27,8 +26,9 @@ public class RestServiceExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorMessage> handleMessageNotReadableException(final HttpMessageNotReadableException ex) {
-        return responseMessage(BAD_REQUEST, new ErrorMessage("Either the request body is missing or JSON is incorrect"));
+    public ResponseEntity handleMessageNotReadableException(final HttpMessageNotReadableException ex) {
+        return responseMessage(BAD_REQUEST,
+                new ErrorMessage("Either the request body is missing or JSON is incorrect"));
     }
 
     private static ResponseEntity responseMessage(final HttpStatus httpStatus, final Object messageBody) {
