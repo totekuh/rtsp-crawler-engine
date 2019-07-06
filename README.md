@@ -14,7 +14,7 @@
 # 1.1 do an aggressive scan:
 ./masscan_to_rtsp.py --masscan 10.0.0.0/8 --aggressive --output masscan_results.txt
 
-<h2> 2. Get the cameras from the Shodan API and feed them into the crawler. You should be a member of Shodan to export their results.</h2>
+<h2> 2. IF YOU ARE A SHODAN MEMBER: Get the cameras from the Shodan API and feed them into the crawler. You should be a member of Shodan to export their results.</h2>
 
 <h2> 1.2 consume the shodan JSON export to extract and probe cameras: </h2>
 torify ./rtsp_probe.py --batch-json shodan-export.json --output probe_result.json
