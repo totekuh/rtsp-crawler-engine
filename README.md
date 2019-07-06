@@ -1,6 +1,6 @@
 # rtsp-crawler-engine
 <br/>The projects contains two modules:
-<br/>1. rtsp crawlers which can probe and stream located RTSP (Real Time Streming Protocol), such as CCTV and so on. Crawlers written in python3.7 and they can do a batch probing for a long number of addresses. As well crawlers are integrated with the masscan https://github.com/robertdavidgraham/masscan which is making them independent of the rtsp sources - they can locate open streams by themselfs, using massive scanning.
+<br/>1. rtsp crawlers which can probe and stream located RTSP (Real Time Streming Protocol), such as CCTV and so on. Crawlers written in python3.7 and they can do a batch probing for a long number of addresses. As well crawlers are integrated with the masscan https://github.com/robertdavidgraham/masscan which is making possible to scan and probe a large number of internet addresses by running one command.
 <br/>2. a backend API to store and categorize probed streams. API written in Java 1.8 / Spring framework. Crawlers can communicate automatically with a backend server while they are doing a long-ride probing.
 
 # There are different ways to obtain the cameras:
