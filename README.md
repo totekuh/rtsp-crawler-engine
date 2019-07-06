@@ -1,11 +1,11 @@
 # rtsp-crawler-engine
 
-<h3>IMPORTANT! RTSP probing is running through a tor proxy, you should probably do the same.</h3>
+<h3>Use a tor proxy to keep yourself anonymous during the rtsp probing.</h3>
 service tor start
 
 # There are different ways to obtain the cameras:
 # 1. blindly scan the internet and locate open streams:
-<h3>REMEMBER! If you are using a masscan to locate the streams, please note that masscan is using it's own TCP/IP stack, so it will ignore your proxy. To avoid this and keep your anonymity safe, you can try to init your scans via VPN connection with packets masquerading.</h3>
+<h3>REMEMBER! If you are using a masscan to locate the streams, please note that masscan uses it's own TCP/IP stack, so it will ignore your proxy. To avoid this and keep your anonymity safe, you can try to init your scans via a VPN connection with packets masquerading.</h3>
 
 ./masscan_to_rtsp.py --masscan 10.0.0.0/8 --output masscan_results.txt
 # 1.1 do an aggressive scan:
@@ -44,7 +44,7 @@ torify ./rtsp_probe.py --url rtsp://10.10.10.10:554 --stream
 </br>  "rtspUrl": "rtsp://82.209.221.80:554",
 </br>  "creationTimestamp": "2019-00-03 12:00:00",
 </br>  "lastUpdateTimestamp": "2019-03-14 07:03:02",
-</br>  "status": "UNAUTHORIZED",
+</br>  "status": "OPEN",
 </br>  "countryName": null,
 </br>  "city": null
 </br>}
@@ -56,7 +56,7 @@ torify ./rtsp_probe.py --url rtsp://10.10.10.10:554 --stream
   </br>"rtspUrl": "rtsp://82.209.221.80:554",
   </br>"creationTimestamp": "2019-00-03 12:00:00",
   </br>"lastUpdateTimestamp": "2019-03-14 07:03:02",
-  </br>"status": "UNAUTHORIZED",
+  </br>"status": "OPEN",
   </br>"countryName": null,
   </br>"city": null
 </br>}
