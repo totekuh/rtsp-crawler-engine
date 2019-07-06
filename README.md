@@ -26,8 +26,8 @@ torify ./rtsp_probe.py --batch-list masscan_results.txt --output probe_result.js
 
 
 # 3 stream retrieved cameras to the backend API:
-torify ./rtsp_probe.py --batch-list masscan_results.txt --output probe_result.json --import http://localhost/camera/stream
-
+torify ./rtsp_probe.py --batch-list masscan_results.txt --output probe_result.json --import http://localhost/cameras/import
+<br/>where http://localhost/cameras/import is the URL to your backend API
 
 # You can use rtsp_probe.py to continuously stream a single camera:
 torify ./rtsp_probe.py --url rtsp://10.10.10.10:554 --stream
