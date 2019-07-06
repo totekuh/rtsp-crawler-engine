@@ -1,8 +1,5 @@
 # rtsp-crawler-engine
 
-<h3>Use a tor proxy to keep yourself anonymous during the rtsp probing.</h3>
-service tor start
-
 # There are different ways to obtain the cameras:
 # 1. blindly scan the internet and locate open streams:
 <h3>REMEMBER! If you are using a masscan to locate the streams, please note that masscan uses it's own TCP/IP stack, so it will ignore your proxy. To avoid this and keep your anonymity safe, you can try to init your scans via a VPN connection with packets masquerading.</h3>
@@ -18,6 +15,7 @@ torify ./rtsp_probe.py --batch-json shodan-export.json --output probe_result.jso
 
 # 2 probe the results
 torify ./rtsp_probe.py --batch-list masscan_results.txt --output probe_result.json
+<br/>Use a tor proxy to keep yourself anonymous during the rtsp probing.
 
 
 
