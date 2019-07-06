@@ -34,7 +34,6 @@ torify ./rtsp_probe.py --url rtsp://10.10.10.10:554 --stream
 </br><b>Use this URL with a rtsp prober to store the results</b>
 </br>POST /cameras/import
 </br>{
-</br> "@timestamp": "yyyy-mm-dd hh:mm:ss"
 </br>  "status": "UNCONNECTED";
 </br>  "url": "rtsp://10.10.10.10:554";
 </br>}
