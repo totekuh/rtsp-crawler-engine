@@ -1,5 +1,5 @@
 #!/usr/bin/python3.7
-
+import base64
 import json
 from argparse import ArgumentParser, RawTextHelpFormatter
 from enum import Enum
@@ -83,6 +83,7 @@ class RtspClient:
             self.status = self.CameraStatus.UNCONNECTED
             self.comment = comment
             self.keywords = set()
+            self.base64_image_data = None
 
         def print_all_keywords(self):
             print('Available keywords:')
@@ -99,7 +100,8 @@ class RtspClient:
                     'comment': self.comment,
                     'keywords': list(self.keywords),
                     'city': self.city,
-                    'isp': self.isp
+                    'isp': self.isp,
+                    'base64ImageData': self.base64_image_data
                 }
             return target
 
@@ -141,6 +143,12 @@ class RtspClient:
         is_connected, frame = self.camera_reader.read()
         if is_connected:
             print('Connected.')
+
+            # convert the captured frame to a base64 string
+            cv2.imwrite('capture.jpg', frame)
+            with open("capture.jpg", "rb") as image_file:
+                target.base64_image_data = base64.b64encode(image_file.read())
+
             target.status = target.CameraStatus.OPEN
             if stream:
                 print('Starting stream...')
