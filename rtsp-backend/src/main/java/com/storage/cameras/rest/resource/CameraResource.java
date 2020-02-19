@@ -29,5 +29,6 @@ public class CameraResource {
     private final String city;
 
     private final Set<Keyword> keywords;
-
+    
+    private final String base64ImageData;
 }

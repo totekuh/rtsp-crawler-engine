@@ -147,7 +147,7 @@ class RtspClient:
             # convert the captured frame to a base64 string
             cv2.imwrite('capture.jpg', frame)
             with open("capture.jpg", "rb") as image_file:
-                target.base64_image_data = base64.b64encode(image_file.read())
+                target.base64_image_data = base64.b64encode(image_file.read()).decode('utf-8')
 
             target.status = target.CameraStatus.OPEN
             if stream:
