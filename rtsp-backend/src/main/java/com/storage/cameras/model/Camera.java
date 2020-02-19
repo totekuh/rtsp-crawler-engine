@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -72,6 +73,10 @@ public class Camera {
 
     @OneToMany(mappedBy = "camera")
     private Set<Comment> comments = new HashSet<>();
+    
+    @Lob
+    @Column(name = "base_64_image_data")
+    private String base64ImageData;
 
     @PreUpdate
     public void updateTrigger() {

@@ -25,4 +25,6 @@ public class PostCameraParams {
     private String isp;
 
     private List<String> keywords;
+    
+    private String base64ImageData;
 }
