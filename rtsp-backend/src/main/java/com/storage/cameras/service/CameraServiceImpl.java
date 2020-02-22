@@ -47,6 +47,7 @@ public class CameraServiceImpl implements CameraService {
                 if (!camera.getLabels().contains(label)) {
                     log.info("Adding {} label to the camera with URL: {}", label.getName(), camera.getUrl());
                     camera.getLabels().add(label);
+                    label.setCamera(camera);
                     labelService.save(label);
                 }
             });
