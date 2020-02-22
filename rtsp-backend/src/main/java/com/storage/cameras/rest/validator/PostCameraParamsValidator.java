@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @AllArgsConstructor
 public class PostCameraParamsValidator {
@@ -22,7 +24,17 @@ public class PostCameraParamsValidator {
                 throw new BadRequestException(format("Invalid keyword value. Should be one of the following: %s",
                         asList(Keyword.values())));
             }
+        }
 
+        final String countryCode = params.getCountryCode();
+        if (isNotBlank(countryCode) && countryCode.length() != 2) {
+            throw new BadRequestException(format("Field 'countryCode' is invalid. " +
+                    "The field value should have only 2 characters length. " +
+                    "The actual value is: %s", countryCode));
+        }
+        
+        if (isBlank(params.getUrl())) {
+            throw new BadRequestException("Field 'url' cannot be blank");
         }
     }
 }

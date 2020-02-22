@@ -31,4 +31,6 @@ public class CameraResource {
     private final Set<Keyword> keywords;
     
     private final String base64ImageData;
+    
+    private final Set<LabelResource> labels;
 }

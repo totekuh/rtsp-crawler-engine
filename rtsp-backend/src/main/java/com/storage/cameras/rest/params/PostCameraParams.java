@@ -27,4 +27,6 @@ public class PostCameraParams {
     private List<String> keywords;
     
     private String base64ImageData;
+    
+    private List<LabelParams> labels;
 }

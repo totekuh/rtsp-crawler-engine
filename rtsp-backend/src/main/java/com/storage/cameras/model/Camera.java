@@ -77,6 +77,9 @@ public class Camera {
     @Lob
     @Column(name = "base_64_image_data")
     private String base64ImageData;
+    
+    @OneToMany(mappedBy = "camera")
+    private Set<Label> labels = new HashSet<>();
 
     @PreUpdate
     public void updateTrigger() {

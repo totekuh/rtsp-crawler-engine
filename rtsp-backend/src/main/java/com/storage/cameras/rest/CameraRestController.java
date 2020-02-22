@@ -1,5 +1,6 @@
 package com.storage.cameras.rest;
 
+import static com.storage.cameras.model.RequestPath.CAMERAS_URL;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
 import com.storage.cameras.rest.resource.CameraIdentifiersResource;
@@ -13,7 +14,10 @@ import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.http.ResponseEntity;
+import static org.springframework.http.ResponseEntity.ok;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,10 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import static com.storage.cameras.model.RequestPath.CAMERAS_URL;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping(CAMERAS_URL)

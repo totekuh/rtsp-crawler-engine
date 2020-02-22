@@ -5,6 +5,8 @@ import com.storage.cameras.dao.CommentDao;
 import com.storage.cameras.mapper.CameraToResourceMapper;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.Comment;
+import com.storage.cameras.model.Label;
+import com.storage.cameras.rest.params.LabelParams;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
 import com.storage.cameras.rest.resource.CameraResource;
@@ -12,6 +14,7 @@ import java.util.List;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import static java.lang.String.format;
@@ -26,6 +29,7 @@ import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 public class CameraServiceImpl implements CameraService {
     private final CameraDao cameraDao;
     private final CommentDao commentDao;
+    private final LabelService labelService;
     private final CameraToResourceMapper mapper = CameraToResourceMapper.INSTANCE;
 
     @Override
@@ -37,6 +41,14 @@ public class CameraServiceImpl implements CameraService {
             camera.getComments().add(comment);
             comment.setCamera(camera);
             commentDao.save(comment);
+        }
+        final List<LabelParams> labelParams = params.getLabels();
+        if (isNotEmpty(params.getLabels())) {
+            labelParams.forEach(receivedLabel -> {
+                final Label label = labelService.findOrCreateLabel(receivedLabel);
+                log.info("Adding {} label to the camera with URL: {}", label.getName(), camera.getUrl());
+                camera.getLabels().add(label);
+            });
         }
         return mapper.convert(camera);
     }
