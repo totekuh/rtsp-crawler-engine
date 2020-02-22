@@ -1,28 +1,29 @@
 package com.storage.cameras.dao;
 
 import com.storage.cameras.mapper.PostCameraParamsToCameraMapper;
+import static com.storage.cameras.mapper.PostCameraParamsToCameraMapper.INSTANCE;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.CameraStatus;
+import static com.storage.cameras.model.CameraStatus.UNCONNECTED;
 import com.storage.cameras.model.Keyword;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
-import java.util.List;
-import java.util.Optional;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-import static com.storage.cameras.mapper.PostCameraParamsToCameraMapper.INSTANCE;
 import static com.storage.cameras.rest.params.SearchCameraParams.Order.CREATION_TIMESTAMP_ASC;
 import static com.storage.cameras.rest.params.SearchCameraParams.Order.CREATION_TIMESTAMP_DESC;
 import static com.storage.cameras.rest.params.SearchCameraParams.Order.ID_ASC;
 import static com.storage.cameras.rest.params.SearchCameraParams.Order.ID_DESC;
 import static java.util.Comparator.comparing;
+import java.util.List;
+import java.util.Optional;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import org.springframework.stereotype.Repository;
 import static org.springframework.transaction.annotation.Propagation.MANDATORY;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Repository
@@ -136,5 +137,15 @@ public class CameraDaoImpl implements CameraDao {
     @Override
     public List<Long> getAllIds() {
         return dataJpaCameraRepository.getAllIds();
+    }
+
+    @Override
+    public List<Camera> getAllUnconnected() {
+        return dataJpaCameraRepository.findAllByStatus(UNCONNECTED);
+    }
+
+    @Override
+    public void delete(Long id) {
+        dataJpaCameraRepository.deleteById(id);
     }
 }

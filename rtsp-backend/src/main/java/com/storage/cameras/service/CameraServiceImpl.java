@@ -82,6 +82,11 @@ public class CameraServiceImpl implements CameraService {
     }
 
     @Override
+    public List<Camera> getAllUnconnected() {
+        return cameraDao.getAllUnconnected();
+    }
+
+    @Override
     public void save(final Camera camera) {
         cameraDao.save(camera);
     }
@@ -89,5 +94,10 @@ public class CameraServiceImpl implements CameraService {
     @Override
     public void save(final List<Camera> cameras) {
         cameraDao.save(cameras);
+    }
+
+    @Override
+    public void delete(Long id) {
+        cameraDao.delete(id);
     }
 }

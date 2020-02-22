@@ -24,4 +24,8 @@ public interface CameraDao {
     List<Camera> findWithNoGeolocation();
 
     List<Long> getAllIds();
+
+    List<Camera> getAllUnconnected();
+
+    void delete(Long id);
 }

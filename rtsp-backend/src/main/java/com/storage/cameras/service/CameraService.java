@@ -23,8 +23,12 @@ public interface CameraService {
     List<Long> getCameraIds();
 
     List<Camera> getWithNoGeolocation();
+    
+    List<Camera> getAllUnconnected();
 
     void save(Camera camera);
 
     void save(List<Camera> cameras);
+
+    void delete(Long id);
 }
