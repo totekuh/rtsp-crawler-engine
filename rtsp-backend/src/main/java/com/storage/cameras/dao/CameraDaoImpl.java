@@ -132,4 +132,9 @@ public class CameraDaoImpl implements CameraDao {
     public List<Camera> findWithNoGeolocation() {
         return dataJpaCameraRepository.findWithNoGeolocation();
     }
+
+    @Override
+    public List<Long> getAllIds() {
+        return dataJpaCameraRepository.getAllIds();
+    }
 }

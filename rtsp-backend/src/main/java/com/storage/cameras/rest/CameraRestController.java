@@ -2,6 +2,7 @@ package com.storage.cameras.rest;
 
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
+import com.storage.cameras.rest.resource.CameraIdentifiersResource;
 import com.storage.cameras.rest.resource.CameraResource;
 import com.storage.cameras.rest.resource.CameraResourceContainer;
 import com.storage.cameras.rest.validator.PostCameraParamsValidator;
@@ -43,7 +44,7 @@ public class CameraRestController {
     @SneakyThrows
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity get(@RequestParam(required = false) final Long id,
-            @RequestParam(required = false) final String rtspUrl) {
+                              @RequestParam(required = false) final String rtspUrl) {
         if (id != null) {
             log.info("Get a camera: {}", id);
             return ok(cameraService.get(id));
@@ -54,6 +55,14 @@ public class CameraRestController {
         }
         final List<CameraResource> cameras = cameraService.getAll();
         return ok(new CameraResourceContainer(cameras.size(), cameras));
+    }
+
+    @SneakyThrows
+    @GetMapping(path = "/ids", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity getCameraIds() {
+        log.info("Getting camera ids");
+        final List<Long> cameraIds = cameraService.getCameraIds();
+        return ok(new CameraIdentifiersResource(cameraIds));
     }
 
     @SneakyThrows

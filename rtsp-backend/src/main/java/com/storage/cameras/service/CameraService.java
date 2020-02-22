@@ -3,6 +3,7 @@ package com.storage.cameras.service;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
+import com.storage.cameras.rest.resource.CameraIdentifiersResource;
 import com.storage.cameras.rest.resource.CameraResource;
 import java.util.List;
 import javassist.NotFoundException;
@@ -18,6 +19,8 @@ public interface CameraService {
     List<CameraResource> search(SearchCameraParams params);
 
     List<CameraResource> getAll();
+    
+    List<Long> getCameraIds();
 
     List<Camera> getWithNoGeolocation();
 

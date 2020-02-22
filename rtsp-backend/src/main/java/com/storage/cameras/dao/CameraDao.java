@@ -22,4 +22,6 @@ public interface CameraDao {
     void save(List<Camera> cameras);
 
     List<Camera> findWithNoGeolocation();
+
+    List<Long> getAllIds();
 }

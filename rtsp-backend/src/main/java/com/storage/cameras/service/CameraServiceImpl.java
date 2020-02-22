@@ -72,6 +72,11 @@ public class CameraServiceImpl implements CameraService {
     }
 
     @Override
+    public List<Long> getCameraIds() {
+        return cameraDao.getAllIds();
+    }
+
+    @Override
     public List<Camera> getWithNoGeolocation() {
         return cameraDao.findWithNoGeolocation();
     }

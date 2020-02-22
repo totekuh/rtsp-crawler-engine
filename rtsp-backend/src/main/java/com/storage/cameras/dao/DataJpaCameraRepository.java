@@ -27,4 +27,7 @@ public interface DataJpaCameraRepository extends JpaRepository<Camera, Long> {
                     "OR country_code IS NULL " +
                     "OR country_name IS NULL")
     List<Camera> findWithNoGeolocation();
+
+    @Query(nativeQuery = true, value = "SELECT id FROM camera")
+    List<Long> getAllIds();
 }
