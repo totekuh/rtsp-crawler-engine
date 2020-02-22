@@ -2,7 +2,6 @@ package com.storage.cameras.service;
 
 import com.storage.cameras.dao.CameraDao;
 import com.storage.cameras.dao.CommentDao;
-import com.storage.cameras.mapper.CameraToResourceMapper;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.Comment;
 import com.storage.cameras.model.Label;
@@ -28,7 +27,6 @@ public class CameraServiceImpl implements CameraService {
     private final CameraDao cameraDao;
     private final CommentDao commentDao;
     private final LabelService labelService;
-    private final CameraToResourceMapper mapper = CameraToResourceMapper.INSTANCE;
 
     @Override
     public Camera save(final PostCameraParams params) {
@@ -44,11 +42,11 @@ public class CameraServiceImpl implements CameraService {
         if (isNotEmpty(params.getLabels())) {
             labelParams.forEach(receivedLabel -> {
                 final Label label = labelService.findOrCreateLabel(receivedLabel);
-                if (!camera.getLabels().contains(label)) {
+                if (cameraDao.isMarkedByLabel(camera, label)) {
+                    // do nothing
+                } else {
                     log.info("Adding {} label to the camera with URL: {}", label.getName(), camera.getUrl());
-                    camera.getLabels().add(label);
-                    label.setCamera(camera);
-                    labelService.save(label);
+                    labelService.markCameraWithLabel(camera, label);
                 }
             });
         }

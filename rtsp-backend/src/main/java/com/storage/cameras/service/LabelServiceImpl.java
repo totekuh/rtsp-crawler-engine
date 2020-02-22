@@ -1,6 +1,9 @@
 package com.storage.cameras.service;
 
+import com.storage.cameras.dao.CameraToLabelDao;
 import com.storage.cameras.dao.LabelDao;
+import com.storage.cameras.model.Camera;
+import com.storage.cameras.model.CameraToLabel;
 import com.storage.cameras.model.Label;
 import com.storage.cameras.rest.params.LabelParams;
 import static java.util.Optional.ofNullable;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class LabelServiceImpl implements LabelService {
     private final LabelDao labelDao;
+    private final CameraToLabelDao cameraToLabelDao;
 
     @Override
     public Label findOrCreateLabel(LabelParams labelParams) {
@@ -31,5 +35,13 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public void save(Label label) {
         labelDao.save(label);
+    }
+
+    @Override
+    public void markCameraWithLabel(Camera camera, Label label) {
+        final CameraToLabel cameraToLabel = new CameraToLabel();
+        cameraToLabel.setCamera(camera);
+        cameraToLabel.setLabel(label);
+        cameraToLabelDao.save(cameraToLabel);
     }
 }

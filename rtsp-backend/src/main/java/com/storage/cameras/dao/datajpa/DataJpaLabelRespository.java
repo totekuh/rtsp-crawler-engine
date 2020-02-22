@@ -1,4 +1,4 @@
-package com.storage.cameras.dao;
+package com.storage.cameras.dao.datajpa;
 
 import com.storage.cameras.model.Label;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,5 +1,6 @@
 package com.storage.cameras.dao;
 
+import com.storage.cameras.dao.datajpa.DataJpaLabelRespository;
 import com.storage.cameras.model.Label;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

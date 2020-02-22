@@ -1,11 +1,13 @@
 package com.storage.cameras.dao;
 
+import com.storage.cameras.dao.datajpa.DataJpaCameraRepository;
 import com.storage.cameras.mapper.PostCameraParamsToCameraMapper;
 import static com.storage.cameras.mapper.PostCameraParamsToCameraMapper.INSTANCE;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.CameraStatus;
 import static com.storage.cameras.model.CameraStatus.UNCONNECTED;
 import com.storage.cameras.model.Keyword;
+import com.storage.cameras.model.Label;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
 import static com.storage.cameras.rest.params.SearchCameraParams.Order.CREATION_TIMESTAMP_ASC;
@@ -147,5 +149,11 @@ public class CameraDaoImpl implements CameraDao {
     @Override
     public void delete(Long id) {
         dataJpaCameraRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean isMarkedByLabel(Camera camera, Label label) {
+        final List<Long> markedByLabelIds = dataJpaCameraRepository.findMarkedByLabel(label);
+        return isNotEmpty(markedByLabelIds) && markedByLabelIds.contains(camera.getId());
     }
 }

@@ -1,7 +1,8 @@
-package com.storage.cameras.dao;
+package com.storage.cameras.dao.datajpa;
 
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.CameraStatus;
+import com.storage.cameras.model.Label;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,4 +31,9 @@ public interface DataJpaCameraRepository extends JpaRepository<Camera, Long> {
 
     @Query(nativeQuery = true, value = "SELECT id FROM camera")
     List<Long> getAllIds();
+
+    @Query(nativeQuery = true, value =
+            "SELECT id FROM camera c " +
+                    "WHERE EXISTS (SELECT 1 FROM label l WHERE l.camera_id = c.id)")
+    List<Long> findMarkedByLabel(Label label);
 }

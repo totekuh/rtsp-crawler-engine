@@ -109,6 +109,8 @@ class DeepLabModel(object):
 
         self.sess = tf.Session(graph=self.graph)
 
+        print('The training model has been initialized')
+
     def run(self, image):
         """Runs inference on a single image.
 
@@ -146,10 +148,14 @@ class DeepLabModel(object):
 
 
 def get_all_images_from_path(path):
+    if not path.endswith('/'):
+        path = f"{path}/"
+
     screenshots = []
-    for file in os.listdir(path):
-        if 'jpg' in file:
-            screenshots.append(f"{path}{file}")
+    files = [file for file in os.listdir(path) if 'jpg' in file]
+    for i, file in enumerate(files):
+        print(f'Reading [{file}][{i}/{len(files)}]\r', end='', flush=True)
+        screenshots.append(f"{path}{file}")
 
     screenshots = screenshots.copy()
     screenshots.sort()
@@ -160,7 +166,6 @@ def main():
     options = get_arguments()
 
     model = DeepLabModel(options.model_path)
-    print('The training model has been initialized')
 
     screenshots = get_all_images_from_path(options.path)
 
