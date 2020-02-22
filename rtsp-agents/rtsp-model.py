@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
+import json
 import os
 import tarfile
-import silence_tensorflow
+
 import numpy as np
+import requests
+import silence_tensorflow
 import tensorflow as tf
 from PIL import Image
 from six.moves import urllib
 
-
 # avoid removing by the import rearrangement
 if silence_tensorflow:
     pass
+
+DEFAULT_MODEL_PATH = './models/'
+
 
 def get_arguments():
     from argparse import ArgumentParser
@@ -19,13 +24,23 @@ def get_arguments():
     parser.add_argument('--path',
                         dest='path',
                         required=True,
-                        help='An absolute path to a folder with stored screenshots from cameras.')
+                        help='A path to a folder with stored screenshots from cameras.')
+    parser.add_argument('--model-path',
+                        dest='model_path',
+                        default=DEFAULT_MODEL_PATH,
+                        required=False,
+                        help='A path to the folder with stored neural-network models. '
+                        f'Default is {DEFAULT_MODEL_PATH}')
+    parser.add_argument('--import-endpoint',
+                        dest='import_endpoint',
+                        required=False,
+                        help='The endpoint of the backend API import service. '
+                             'If this argument is given, the scripts sends discovered labels '
+                             'to the backend API immediately')
     options = parser.parse_args()
 
     return options
 
-
-options = get_arguments()
 
 MODEL_NAME = 'xception_coco_voctrainaug'
 
@@ -50,7 +65,6 @@ LABEL_NAMES = np.asarray([
     'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tv'
 ])
 SAMPLE_IMAGE = 'image1'  # @param ['image1', 'image2', 'image3']
-IMAGE_URL = ''  # @param {type:"string"}
 
 
 # https://colab.research.google.com/github/tensorflow/models/blob/master/research/deeplab/deeplab_demo.ipynb#scrollTo
@@ -63,10 +77,9 @@ class DeepLabModel(object):
     INPUT_SIZE = 513
     FROZEN_GRAPH_NAME = 'frozen_inference_graph'
 
-    def __init__(self):
+    def __init__(self, model_dir):
         """Creates and loads pretrained deeplab model."""
         self.graph = tf.Graph()
-        model_dir = './models/'  # tempfile.mkdtemp()
         tf.gfile.MakeDirs(model_dir)
         tarball_path = os.path.join(model_dir, MODEL_NAME + _TARBALL_NAME)
         if not os.path.exists(tarball_path):
@@ -124,12 +137,12 @@ class DeepLabModel(object):
         try:
             original_im = Image.open(image_path)
         except IOError:
-            raise Exception('Cannot open image, please check the file: ' + image_path)
+            raise Exception(f'Cannot open image, please check the file: {image_path}')
         resized_im, seg_map = self.run(original_im)
         unique_labels = np.unique(seg_map)
-        labels = set()
+        labels = []
         for label in LABEL_NAMES[unique_labels]:
-            labels.add(label)
+            labels.append(label)
         return labels
 
 
@@ -146,15 +159,34 @@ def get_all_images_from_path(path):
 
 def main():
     options = get_arguments()
-    model = DeepLabModel()
 
+    model = DeepLabModel(options.model_path)
     screenshots = get_all_images_from_path(options.path)
 
-    for screenshot_path in screenshots:
-        print(f'Processing [{screenshot_path}]', end='', flush=True)
+    for i, screenshot_path in enumerate(screenshots):
         labels = model.get_labels_from_image_file(image_path=screenshot_path)
+        print(f'Processing [{screenshot_path}][{i + 1}/{len(screenshots)}]', end='', flush=True)
         if labels:
             print(f" - [{'; '.join(labels)}]")
+
+            # update the metadata file to include discovered labels
+            json_file_name = screenshot_path.replace('.jpg', '.json')
+            if os.path.exists(json_file_name):
+                with open(json_file_name, 'r', encoding='utf-8') as f:
+                    stored_camera_data = json.load(f)
+                stored_camera_data['labels'] = [{
+                    'name': label
+                } for label in labels]
+                with open(json_file_name, 'w', encoding='utf-8') as f:
+                    json.dump(stored_camera_data, f)
+
+                if options.import_endpoint:
+                    print('Sending the labels to the backend API ', end='', flush=True)
+                    try:
+                        resp = requests.put(options.import_endpoint, json=stored_camera_data)
+                        print(f' - HTTP/1.1 {resp.status_code}')
+                    except Exception as e:
+                        print(f' - {e}')
 
 
 if __name__ == '__main__':
