@@ -24,7 +24,12 @@ public class LabelServiceImpl implements LabelService {
                 .orElseGet(() -> {
                     final Label newLabel = new Label();
                     newLabel.setName(labelName);
-                    return labelDao.save(newLabel);
+                    return newLabel;
                 });
+    }
+
+    @Override
+    public void save(Label label) {
+        labelDao.save(label);
     }
 }

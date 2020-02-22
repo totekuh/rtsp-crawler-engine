@@ -48,6 +48,7 @@ public class CameraServiceImpl implements CameraService {
                 final Label label = labelService.findOrCreateLabel(receivedLabel);
                 log.info("Adding {} label to the camera with URL: {}", label.getName(), camera.getUrl());
                 camera.getLabels().add(label);
+                labelService.save(label);
             });
         }
         return mapper.convert(camera);

@@ -183,8 +183,17 @@ def main():
                 if options.import_endpoint:
                     print('Sending the labels to the backend API ', end='', flush=True)
                     try:
-                        resp = requests.put(options.import_endpoint, json=stored_camera_data)
-                        print(f' - HTTP/1.1 {resp.status_code}')
+                        camera_update_params = {
+                            'url': stored_camera_data['rtspUrl'],
+                            'labels': [{
+                                'name': label
+                            } for label in labels]
+                        }
+                        resp = requests.put(options.import_endpoint, json=camera_update_params)
+                        if resp.ok:
+                            print(f' - HTTP/1.1 {resp.status_code}')
+                        else:
+                            print(f' - HTTP/1.1 {resp.status_code} {resp.json()}')
                     except Exception as e:
                         print(f' - {e}')
 
