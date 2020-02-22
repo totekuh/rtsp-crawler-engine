@@ -4,6 +4,5 @@ import lombok.Value;
 
 @Value
 public class LabelResource {
-    Long id;
     String name;
 }
