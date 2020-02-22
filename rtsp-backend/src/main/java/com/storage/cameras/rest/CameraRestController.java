@@ -48,7 +48,7 @@ public class CameraRestController {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity get(@RequestParam(required = false) final Long id,
                               @RequestParam(required = false) final String rtspUrl,
-                              @RequestParam(required = false) final boolean includeBase64ImageData) {
+                              @RequestParam(required = false) final Boolean includeBase64ImageData) {
         if (id != null) {
             log.info("Get a camera: {}", id);
             return ok(cameraService.get(id));
@@ -90,7 +90,7 @@ public class CameraRestController {
         new SearchCameraParamsValidator(params).validate();
         final List<CameraResource> cameras = cameraService.search(params)
                 .stream()
-                .map(cameraToResourceMapper::convert)
+                .map(camera -> cameraToResourceMapper.convert(camera))
                 .collect(toList());
         return ok(new CameraResourceContainer(cameras.size(), cameras));
     }
