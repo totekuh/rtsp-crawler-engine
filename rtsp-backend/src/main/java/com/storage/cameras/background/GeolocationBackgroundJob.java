@@ -40,8 +40,7 @@ public class GeolocationBackgroundJob {
             while (true) {
                 final List<Camera> camerasToLookup = cameraService.getWithNoGeolocation();
                 if (isNotEmpty(camerasToLookup)) {
-                    log.info("Starting a geolocation job. Number of cameras to lookup: {}", camerasToLookup.size());
-
+                    log.info("Starting a new geolocation job. Number of cameras to lookup: {}", camerasToLookup.size());
                     camerasToLookup
                             .forEach(camera -> doGeolocationLookup(camera.getIpAddress())
                                     .ifPresent(geolocationResult -> {
@@ -51,9 +50,9 @@ public class GeolocationBackgroundJob {
                                         camera.setIsp(geolocationResult.getIsp());
                                     }));
                     cameraService.save(camerasToLookup);
-                    log.info("Geolocation job finished successfully.");
+                    log.info("Geolocation job has finished successfully.");
                 } else {
-                    log.info("No cameras received for the geolocation lookup");
+                    log.info("No cameras have been received for the geolocation lookup");
                 }
                 log.info("Sleeping for the {} minutes", (SLEEPING_TIMER_IN_MS / 1000) / 60);
                 try {
