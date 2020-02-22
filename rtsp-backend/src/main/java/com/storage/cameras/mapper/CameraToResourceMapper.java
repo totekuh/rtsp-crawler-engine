@@ -10,7 +10,10 @@ public interface CameraToResourceMapper {
     CameraToResourceMapper INSTANCE = camera -> new CameraResource(
             camera.getId(),
             camera.getUrl(),
-            camera.getComments().stream().map(CommentToResourceMapper.INSTANCE::convert).collect(toList()),
+            camera.getComments()
+                    .stream()
+                    .map(CommentToResourceMapper.INSTANCE::convert)
+                    .collect(toList()),
             formatDateToString(camera.getCreationTimestamp()),
             formatDateToString(camera.getUpdateTimestamp()),
             camera.getStatus().name(),
