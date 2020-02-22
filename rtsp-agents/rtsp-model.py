@@ -108,7 +108,6 @@ class DeepLabModel(object):
             tf.import_graph_def(graph_def, name='')
 
         self.sess = tf.Session(graph=self.graph)
-        print('The training model has been initialized')
 
     def run(self, image):
         """Runs inference on a single image.
@@ -161,6 +160,8 @@ def main():
     options = get_arguments()
 
     model = DeepLabModel(options.model_path)
+    print('The training model has been initialized')
+
     screenshots = get_all_images_from_path(options.path)
 
     for i, screenshot_path in enumerate(screenshots):

@@ -1,5 +1,6 @@
 package com.storage.cameras.rest;
 
+import com.storage.cameras.mapper.CameraToResourceMapper;
 import static com.storage.cameras.model.RequestPath.CAMERAS_URL;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
@@ -10,6 +11,7 @@ import com.storage.cameras.rest.validator.PostCameraParamsValidator;
 import com.storage.cameras.rest.validator.SearchCameraParamsValidator;
 import com.storage.cameras.service.CameraService;
 import java.util.List;
+import static java.util.stream.Collectors.toList;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CameraRestController {
 
     private final CameraService cameraService;
+    private final CameraToResourceMapper cameraToResourceMapper = CameraToResourceMapper.INSTANCE;
 
     @PutMapping(value = "/import", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity receive(@RequestBody final PostCameraParams params) {
@@ -44,7 +47,8 @@ public class CameraRestController {
     @SneakyThrows
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity get(@RequestParam(required = false) final Long id,
-                              @RequestParam(required = false) final String rtspUrl) {
+                              @RequestParam(required = false) final String rtspUrl,
+                              @RequestParam(required = false) final boolean includeBase64ImageData) {
         if (id != null) {
             log.info("Get a camera: {}", id);
             return ok(cameraService.get(id));
@@ -53,7 +57,22 @@ public class CameraRestController {
             log.info("Get a camera: {}", rtspUrl);
             return ok(cameraService.get(rtspUrl));
         }
-        final List<CameraResource> cameras = cameraService.getAll();
+        final List<CameraResource> cameras;
+        if (includeBase64ImageData) {
+            cameras = cameraService.getAll()
+                    .stream()
+                    .map(cameraToResourceMapper::convert)
+                    .collect(toList());
+        } else {
+            cameras = cameraService.getAll()
+                    .stream()
+                    .map(camera -> {
+                        camera.setBase64ImageData(null);
+                        return cameraToResourceMapper.convert(camera);
+                    })
+                    .collect(toList());
+        }
+
         return ok(new CameraResourceContainer(cameras.size(), cameras));
     }
 
@@ -69,7 +88,10 @@ public class CameraRestController {
     @PostMapping(value = "/search", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity search(@RequestBody @Valid SearchCameraParams params) {
         new SearchCameraParamsValidator(params).validate();
-        final List<CameraResource> cameras = cameraService.search(params);
+        final List<CameraResource> cameras = cameraService.search(params)
+                .stream()
+                .map(cameraToResourceMapper::convert)
+                .collect(toList());
         return ok(new CameraResourceContainer(cameras.size(), cameras));
     }
 }

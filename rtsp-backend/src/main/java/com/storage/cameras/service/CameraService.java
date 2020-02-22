@@ -10,15 +10,15 @@ import javassist.NotFoundException;
 
 public interface CameraService {
 
-    CameraResource save(PostCameraParams params);
+    Camera save(PostCameraParams params);
 
-    CameraResource get(Long id) throws NotFoundException;
+    Camera get(Long id) throws NotFoundException;
 
-    CameraResource get(String rtspUrl) throws NotFoundException;
+    Camera get(String rtspUrl) throws NotFoundException;
 
-    List<CameraResource> search(SearchCameraParams params);
+    List<Camera> search(SearchCameraParams params);
 
-    List<CameraResource> getAll();
+    List<Camera> getAll();
     
     List<Long> getCameraIds();
 
