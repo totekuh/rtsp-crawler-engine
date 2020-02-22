@@ -34,6 +34,7 @@ public interface DataJpaCameraRepository extends JpaRepository<Camera, Long> {
 
     @Query(nativeQuery = true, value =
             "SELECT id FROM camera c " +
-                    "WHERE EXISTS (SELECT 1 FROM label l WHERE l.camera_id = c.id)")
-    List<Long> findMarkedByLabel(Label label);
+                    "WHERE EXISTS (SELECT 1 FROM camera_to_label ctl WHERE ctl.camera_id = c.id AND " +
+                    "ctl.label_id =:labelId) ")
+    List<Long> findMarkedByLabelId(Long labelId);
 }

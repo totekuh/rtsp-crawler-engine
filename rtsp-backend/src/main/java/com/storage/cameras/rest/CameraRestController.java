@@ -1,6 +1,8 @@
 package com.storage.cameras.rest;
 
 import com.storage.cameras.mapper.CameraToResourceMapper;
+import com.storage.cameras.mapper.LabelToResourceMapper;
+import com.storage.cameras.model.Camera;
 import static com.storage.cameras.model.RequestPath.CAMERAS_URL;
 import com.storage.cameras.rest.params.PostCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
@@ -10,8 +12,11 @@ import com.storage.cameras.rest.resource.CameraResourceContainer;
 import com.storage.cameras.rest.validator.PostCameraParamsValidator;
 import com.storage.cameras.rest.validator.SearchCameraParamsValidator;
 import com.storage.cameras.service.CameraService;
+import com.storage.cameras.service.LabelService;
 import java.util.List;
+import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -35,7 +40,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class CameraRestController {
 
     private final CameraService cameraService;
+    private final LabelService labelService;
     private final CameraToResourceMapper cameraToResourceMapper = CameraToResourceMapper.INSTANCE;
+    private final LabelToResourceMapper labelToResourceMapper = LabelToResourceMapper.INSTANCE;
 
     @PutMapping(value = "/import", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity receive(@RequestBody final PostCameraParams params) {
@@ -51,11 +58,25 @@ public class CameraRestController {
                               @RequestParam(required = false) final Boolean includeBase64ImageData) {
         if (id != null) {
             log.info("Get a camera: {}", id);
-            return ok(cameraService.get(id));
+            final Camera camera = cameraService.get(id);
+            final CameraResource cameraResource = 
+                    cameraToResourceMapper.convert(camera, includeBase64ImageData);
+            cameraResource.setLabels(labelService.getLabelsByCamera(camera)
+            .stream()
+            .map(labelToResourceMapper::convert)
+            .collect(toSet()));
+            return ok(cameraResource);
         }
         if (isNotBlank(rtspUrl)) {
             log.info("Get a camera: {}", rtspUrl);
-            return ok(cameraService.get(rtspUrl));
+            final Camera camera = cameraService.get(rtspUrl);
+            final CameraResource cameraResource =
+                    cameraToResourceMapper.convert(camera, includeBase64ImageData);
+            cameraResource.setLabels(labelService.getLabelsByCamera(camera)
+                    .stream()
+                    .map(labelToResourceMapper::convert)
+                    .collect(toSet()));
+            return ok(cameraResource);
         }
         final List<CameraResource> cameras;
         if (includeBase64ImageData) {

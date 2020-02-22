@@ -4,7 +4,6 @@ import com.storage.cameras.model.Camera;
 import com.storage.cameras.rest.resource.CameraResource;
 import static com.storage.cameras.util.DateTimeUtil.formatDateToString;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 public interface CameraToResourceMapper {
     CameraToResourceMapper INSTANCE = camera -> new CameraResource(
@@ -22,10 +21,15 @@ public interface CameraToResourceMapper {
             camera.getCity(),
             camera.getKeywords(),
             camera.getBase64ImageData(),
-            camera.getLabels()
-                    .stream()
-                    .map(LabelToResourceMapper.INSTANCE::convert)
-                    .collect(toSet()));
+            null);
 
     CameraResource convert(Camera camera);
+
+    default CameraResource convert(Camera camera, Boolean includeBase64ImageData) {
+        final CameraResource cameraResource = INSTANCE.convert(camera);
+        if (includeBase64ImageData) {
+            cameraResource.setBase64ImageData(null);
+        }
+        return cameraResource;
+    }
 }

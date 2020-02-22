@@ -6,6 +6,7 @@ import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.CameraToLabel;
 import com.storage.cameras.model.Label;
 import com.storage.cameras.rest.params.LabelParams;
+import java.util.List;
 import static java.util.Optional.ofNullable;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,5 +44,10 @@ public class LabelServiceImpl implements LabelService {
         cameraToLabel.setCamera(camera);
         cameraToLabel.setLabel(label);
         cameraToLabelDao.save(cameraToLabel);
+    }
+
+    @Override
+    public List<Label> getLabelsByCamera(Camera camera) {
+        return labelDao.findLabelsByCamera(camera);
     }
 }

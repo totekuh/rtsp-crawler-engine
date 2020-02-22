@@ -153,7 +153,7 @@ public class CameraDaoImpl implements CameraDao {
 
     @Override
     public boolean isMarkedByLabel(Camera camera, Label label) {
-        final List<Long> markedByLabelIds = dataJpaCameraRepository.findMarkedByLabel(label);
+        final List<Long> markedByLabelIds = dataJpaCameraRepository.findMarkedByLabelId(label.getId());
         return isNotEmpty(markedByLabelIds) && markedByLabelIds.contains(camera.getId());
     }
 }

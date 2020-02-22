@@ -1,27 +1,29 @@
 package com.storage.cameras.model;
 
+import static java.lang.String.format;
 import java.util.Arrays;
+import static java.util.Collections.emptySet;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import static java.util.stream.Collectors.toSet;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import static javax.persistence.EnumType.STRING;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
+import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import static java.lang.String.format;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toSet;
-import static javax.persistence.EnumType.STRING;
-import static javax.persistence.GenerationType.IDENTITY;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -73,13 +75,10 @@ public class Camera {
 
     @OneToMany(mappedBy = "camera")
     private Set<Comment> comments = new HashSet<>();
-    
+
     @Lob
     @Column(name = "base_64_image_data")
     private String base64ImageData;
-    
-    @OneToMany(mappedBy = "camera")
-    private Set<Label> labels = new HashSet<>();
 
     @PreUpdate
     public void updateTrigger() {

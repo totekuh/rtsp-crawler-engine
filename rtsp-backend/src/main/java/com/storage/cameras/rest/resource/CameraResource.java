@@ -5,32 +5,34 @@ import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class CameraResource {
 
-    private final Long cameraId;
+    private Long cameraId;
 
-    private final String rtspUrl;
+    private String rtspUrl;
 
-    private final List<CommentResource> comments;
+    private List<CommentResource> comments;
 
-    private final String creationTimestamp;
+    private String creationTimestamp;
 
-    private final String lastUpdateTimestamp;
+    private String lastUpdateTimestamp;
 
-    private final String status;
+    private String status;
 
-    private final String countryName;
+    private String countryName;
 
-    private final String countryCode;
+    private String countryCode;
 
-    private final String city;
+    private String city;
 
-    private final Set<Keyword> keywords;
-    
-    private final String base64ImageData;
-    
-    private final Set<LabelResource> labels;
+    private Set<Keyword> keywords;
+
+    private String base64ImageData;
+
+    private Set<LabelResource> labels;
 }
