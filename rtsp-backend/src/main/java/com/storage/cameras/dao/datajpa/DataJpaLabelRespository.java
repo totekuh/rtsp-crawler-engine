@@ -9,7 +9,8 @@ import org.springframework.data.repository.query.Param;
 public interface DataJpaLabelRespository extends JpaRepository<Label, Long> {
     Label findByName(String name);
 
-    @Query(nativeQuery = true, value = "SELECT * FROM label l" +
-            "WHERE EXISTS (SELECT 1 FROM camera_to_label ctl WHERE ctl.label_id = l.id AND ctl.camera_id =:cameraId)")
+    @Query(nativeQuery = true, value = 
+            "SELECT * FROM label l WHERE EXISTS (SELECT 1 FROM camera_to_label ctl " +
+            "              WHERE ctl.label_id = l.id AND ctl.camera_id =:cameraId)")
     List<Label> findAllByCameraId(@Param(value = "cameraId") Long cameraId);
 }
