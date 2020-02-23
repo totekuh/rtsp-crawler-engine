@@ -29,6 +29,8 @@ public interface CameraToResourceMapper {
     default CameraResource convert(Camera camera, Boolean includeBase64ImageData) {
         final CameraResource cameraResource = INSTANCE.convert(camera);
         if (isTrue(includeBase64ImageData)) {
+            // do nothing
+        } else {
             cameraResource.setBase64ImageData(null);
         }
         return cameraResource;
