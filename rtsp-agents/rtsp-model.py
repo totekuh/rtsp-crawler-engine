@@ -154,7 +154,7 @@ def get_all_images_from_path(path):
     screenshots = []
     files = [file for file in os.listdir(path) if 'jpg' in file]
     for i, file in enumerate(files):
-        print(f'Reading [{file}][{i}/{len(files)}]\r', end='', flush=True)
+        print(f'Reading [{file}][{i + 1}/{len(files)}]\r', end='', flush=True)
         screenshots.append(f"{path}{file}")
 
     screenshots = screenshots.copy()

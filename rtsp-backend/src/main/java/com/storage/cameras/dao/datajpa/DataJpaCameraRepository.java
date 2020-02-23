@@ -2,10 +2,10 @@ package com.storage.cameras.dao.datajpa;
 
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.CameraStatus;
-import com.storage.cameras.model.Label;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface DataJpaCameraRepository extends JpaRepository<Camera, Long> {
     Camera getById(Long id);
@@ -15,8 +15,6 @@ public interface DataJpaCameraRepository extends JpaRepository<Camera, Long> {
     List<Camera> findAll();
 
     List<Camera> findAllByStatus(CameraStatus status);
-
-    List<Camera> findAllByCountryCode(String countryCode);
 
     List<Camera> findAllByStatusAndCountryCode(CameraStatus status, String countryCode);
 
@@ -36,5 +34,5 @@ public interface DataJpaCameraRepository extends JpaRepository<Camera, Long> {
             "SELECT id FROM camera c " +
                     "WHERE EXISTS (SELECT 1 FROM camera_to_label ctl WHERE ctl.camera_id = c.id AND " +
                     "ctl.label_id =:labelId) ")
-    List<Long> findMarkedByLabelId(Long labelId);
+    List<Long> findMarkedByLabelId(@Param(value = "labelId") Long labelId);
 }
