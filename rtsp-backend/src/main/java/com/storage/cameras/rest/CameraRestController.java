@@ -14,13 +14,13 @@ import com.storage.cameras.rest.validator.SearchCameraParamsValidator;
 import com.storage.cameras.service.CameraService;
 import com.storage.cameras.service.LabelService;
 import java.util.List;
-import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.http.ResponseEntity;
@@ -56,22 +56,22 @@ public class CameraRestController {
     public ResponseEntity get(@RequestParam(required = false) final Long id,
                               @RequestParam(required = false) final String rtspUrl,
                               @RequestParam(required = false) final Boolean includeBase64ImageData) {
-        if (id != null) {
-            log.info("Get a camera: {}", id);
-            final Camera camera = cameraService.get(id);
-            final CameraResource cameraResource = 
-                    cameraToResourceMapper.convert(camera, includeBase64ImageData);
-            cameraResource.setLabels(labelService.getLabelsByCamera(camera)
-            .stream()
-            .map(labelToResourceMapper::convert)
-            .collect(toSet()));
-            return ok(cameraResource);
-        }
-        if (isNotBlank(rtspUrl)) {
-            log.info("Get a camera: {}", rtspUrl);
-            final Camera camera = cameraService.get(rtspUrl);
+        if (id != null || isNotBlank(rtspUrl)) {
+            final Camera camera;
+            if (id != null) {
+                log.info("Get a camera: {}", id);
+                camera = cameraService.get(id);
+            } else {
+                log.info("Get a camera: {}", rtspUrl);
+                camera = cameraService.get(rtspUrl);
+            }
             final CameraResource cameraResource =
                     cameraToResourceMapper.convert(camera, includeBase64ImageData);
+            if (isTrue(includeBase64ImageData)) {
+                // do nothing
+            } else {
+                cameraResource.setBase64ImageData(null);
+            }
             cameraResource.setLabels(labelService.getLabelsByCamera(camera)
                     .stream()
                     .map(labelToResourceMapper::convert)
