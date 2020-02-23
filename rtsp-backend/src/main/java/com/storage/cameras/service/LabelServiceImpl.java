@@ -50,4 +50,9 @@ public class LabelServiceImpl implements LabelService {
     public List<Label> getLabelsByCamera(Camera camera) {
         return labelDao.findLabelsByCamera(camera);
     }
+
+    @Override
+    public void unlinkLabelsFromCamera(Long cameraId) {
+        cameraToLabelDao.deleteByCameraId(cameraId);
+    }
 }

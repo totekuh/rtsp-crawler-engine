@@ -14,4 +14,6 @@ public interface LabelService {
     void markCameraWithLabel(Camera camera, Label label);
 
     List<Label> getLabelsByCamera(Camera camera);
+
+    void unlinkLabelsFromCamera(Long id);
 }

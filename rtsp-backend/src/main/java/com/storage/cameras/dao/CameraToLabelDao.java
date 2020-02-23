@@ -5,4 +5,6 @@ import com.storage.cameras.model.CameraToLabel;
 public interface CameraToLabelDao {
     
     void save(CameraToLabel cameraToLabel);
+
+    void deleteByCameraId(Long cameraId);
 }

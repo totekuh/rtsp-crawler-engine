@@ -14,4 +14,9 @@ public class CameraToLabelDaoImpl implements CameraToLabelDao {
     public void save(CameraToLabel cameraToLabel) {
         dataJpaCameraToLabelRepository.save(cameraToLabel);
     }
+
+    @Override
+    public void deleteByCameraId(Long cameraId) {
+        dataJpaCameraToLabelRepository.deleteByCameraId(cameraId);
+    }
 }
