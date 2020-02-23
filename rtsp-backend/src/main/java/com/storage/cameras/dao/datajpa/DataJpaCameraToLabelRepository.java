@@ -7,6 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface DataJpaCameraToLabelRepository extends JpaRepository<CameraToLabel, Long> {
     @Query(nativeQuery = true,
-            value = "DELETE FROM camera_to_label ctl WHERE ctl.camera_id = :cameraId")
+            value = "DELETE FROM camera_to_label WHERE camera_id = :cameraId")
     void deleteByCameraId(@Param(value = "cameraId") Long cameraId);
 }
