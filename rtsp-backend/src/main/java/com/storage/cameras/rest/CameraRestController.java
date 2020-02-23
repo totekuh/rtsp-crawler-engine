@@ -20,6 +20,7 @@ import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.http.ResponseEntity;
@@ -73,7 +74,7 @@ public class CameraRestController {
             return ok(cameraResource);
         }
         final List<CameraResource> cameras;
-        if (includeBase64ImageData) {
+        if (isTrue(includeBase64ImageData)) {
             cameras = cameraService.getAll()
                     .stream()
                     .map(cameraToResourceMapper::convert)
