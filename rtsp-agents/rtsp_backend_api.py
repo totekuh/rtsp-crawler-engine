@@ -157,7 +157,7 @@ class RtspBackendClient:
             if camera_rtsp_url:
                 url = f'{url}?rtspUrl={camera_rtsp_url}'
 
-            resp = self.session.get(url)
+            resp = self.session.get(url + "&includeBase64ImageData=true")
             if resp.ok:
                 return resp.json()
             else:
@@ -279,7 +279,7 @@ def get_camera(client, id=None, rtsp_url=None):
     if camera and camera['status'] == 'OPEN' and camera['base64ImageData']:
         client.write_base64_encoded_images_to_file(camera)
     else:
-        print('No such cameras has been found in the RTSP database.')
+        print('No such cameras have been found in the RTSP database.')
         exit()
 
 
