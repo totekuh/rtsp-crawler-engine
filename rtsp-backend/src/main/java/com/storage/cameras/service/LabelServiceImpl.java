@@ -29,7 +29,7 @@ public class LabelServiceImpl implements LabelService {
                 .orElseGet(() -> {
                     final Label newLabel = new Label();
                     newLabel.setName(labelName);
-                    return newLabel;
+                    return labelDao.save(newLabel);
                 });
     }
 

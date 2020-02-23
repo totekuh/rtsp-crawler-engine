@@ -111,7 +111,7 @@ public class CameraRestController {
         new SearchCameraParamsValidator(params).validate();
         final List<CameraResource> cameras = cameraService.search(params)
                 .stream()
-                .map(camera -> cameraToResourceMapper.convert(camera))
+                .map(cameraToResourceMapper::convert)
                 .collect(toList());
         return ok(new CameraResourceContainer(cameras.size(), cameras));
     }
