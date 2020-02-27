@@ -27,7 +27,7 @@ global_notification_callback = None
 @notification_server_app.route('/notification', methods=['POST'])
 def notification():
     global global_notification_callback
-    global_notification_callback = request.json()
+    global_notification_callback = request.json
 
     return "Thank you very much!"
 
