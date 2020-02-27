@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import json
 from functools import wraps
+from os import linesep, listdir, chdir
 
-from config import TOKEN, WHITELIST
 from telegram import ParseMode
 from telegram.ext import CommandHandler, Updater
+
+from config import TOKEN, WHITELIST
+
+ALL_LABELS = [
+    'background', 'aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
+    'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike',
+    'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tv'
+]
 
 
 def get_arguments():
@@ -41,21 +50,99 @@ def whitelist_only(func):
     return wrapped
 
 
+class RtspFileWatcher:
+    def __init__(self, health_check_path):
+        self.health_check_path = health_check_path
+        self.cameras_json_list = []
+
+        chdir(self.health_check_path)
+        for file in listdir('.'):
+            if '.json' in file:
+                with open(file, 'r') as f:
+                    self.cameras_json_list.append(json.load(f))
+
+    def find_by_label(self, label):
+        cameras = []
+        for camera in self.cameras_json_list:
+            if 'labels' in camera:
+                for stored_label in camera['labels']:
+                    if label in stored_label['name']:
+                        cameras.append(camera)
+        return cameras
+
+
+rtsp_file_watcher = None
+
+
 def start(update, context):
     """Send a message when the command /start is issued."""
+    text = "Registering the RTSP monitor..."
+    update.message.reply_text(text)
+
+    global rtsp_file_watcher
+    options = get_arguments()
+    if rtsp_file_watcher:
+        update.message.reply_text('The RTSP monitor is already registered.')
+    else:
+        rtsp_file_watcher = RtspFileWatcher(options.path)
+        update.message.reply_text(f'The RTSP monitor has been initialized with '
+                                  f'{len(rtsp_file_watcher.cameras_json_list)} cameras')
+
+
+@whitelist_only
+def help(update, context):
     text = (
-        "Starting the rtsp notification listener.\n"
+            'Use this bot to find cameras by the given labels.\n'
+            'The /find command prints the number of cameras.\n'
+            'The /monitor command periodically sends screenshots of cameras.\n\n'
+            'All possible labels are:\n' +
+            '\n'.join(ALL_LABELS)
     )
     update.message.reply_text(text)
 
 
 @whitelist_only
-def healthcheck(update, context):
-    pass
+def find(update, context):
+    if not rtsp_file_watcher:
+        update.message.reply_text('The RTSP monitor is not initialized. Use /start to enable it.')
+        return
+    labels = context.args
+
+    if not labels:
+        update.message.reply_text('Searching all cameras...')
+        for label in ALL_LABELS:
+            cameras_by_label = rtsp_file_watcher.find_by_label(label)
+            if cameras_by_label:
+                update.message.reply_text(f'[{label}] - {len(cameras_by_label)} cameras')
+        return
+    else:
+        update.message.reply_text(f'Searching by: [{linesep.join(labels)}]')
+        for label in labels:
+            cameras_by_label = rtsp_file_watcher.find_by_label(label)
+            if cameras_by_label:
+                update.message.reply_text(f'[{label}] - {len(cameras_by_label)} cameras')
 
 
-# if context.args:
-#     update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
+
+@whitelist_only
+def monitor(update, context):
+    if not rtsp_file_watcher:
+        update.message.reply_text('The RTSP monitor is not initialized. Use /start to enable it.')
+        return
+    labels = context.args
+
+    if not labels:
+        update.message.reply_text('You have to specify a label or a space-separated list of labels to monitor.\n' +
+                                  'Use /help for more info.')
+    else:
+        update.message.reply_text(f'Monitoring cameras by: [{linesep.join(labels)}]')
+        for label in labels:
+            cameras_by_label = rtsp_file_watcher.find_by_label(label)
+            if cameras_by_label:
+                for camera in cameras_by_label:
+                    img_file = f'{camera["cameraId"]}.jpg'
+                    metadata = f"country: {camera['countryName']}; city: {camera['city']}; rtsp-url: {camera['rtspUrl']}"
+                    update.message.reply_photo(open(img_file, 'rb'), caption=metadata)
 
 
 def error(update, context):
@@ -71,12 +158,13 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("healthcheck", healthcheck))
+    dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("find", find))
+    dp.add_handler(CommandHandler("monitor", monitor))
     dp.add_error_handler(error)
 
     updater.start_polling()
     print("BOT DEPLOYED. Ctrl+C to terminate")
-
     updater.idle()
 
 
