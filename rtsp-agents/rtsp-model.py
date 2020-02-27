@@ -37,6 +37,12 @@ def get_arguments():
                         help='The endpoint of the backend API import service. '
                              'If this argument is given, the scripts sends discovered labels '
                              'to the backend API immediately')
+    parser.add_argument('--daemon',
+                        action='store_true',
+                        required=False,
+                        help='Send the script to work in the background. '
+                             'During the work, the script periodically rescans '
+                             'to update the screenshots from cameras and publish new labels. ')
     options = parser.parse_args()
 
     return options
@@ -162,13 +168,8 @@ def get_all_images_from_path(path):
     return screenshots
 
 
-def main():
-    options = get_arguments()
-
-    model = DeepLabModel(options.model_path)
-
-    screenshots = get_all_images_from_path(options.path)
-
+def run_model_on_screenshots(model, path_to_screenshots, import_endpoint=None):
+    screenshots = get_all_images_from_path(path_to_screenshots)
     for i, screenshot_path in enumerate(screenshots):
         labels = model.get_labels_from_image_file(image_path=screenshot_path)
         print(f'Processing [{screenshot_path}][{i + 1}/{len(screenshots)}]', end='', flush=True)
@@ -180,28 +181,49 @@ def main():
             if os.path.exists(json_file_name):
                 with open(json_file_name, 'r', encoding='utf-8') as f:
                     stored_camera_data = json.load(f)
-                stored_camera_data['labels'] = [{
+
+                discovered_labels = [{
                     'name': label
                 } for label in labels]
-                with open(json_file_name, 'w', encoding='utf-8') as f:
-                    json.dump(stored_camera_data, f)
 
-                if options.import_endpoint:
-                    print('Sending the labels to the backend API ', end='', flush=True)
-                    try:
-                        camera_update_params = {
-                            'url': stored_camera_data['rtspUrl'],
-                            'labels': [{
-                                'name': label
-                            } for label in labels]
-                        }
-                        resp = requests.put(options.import_endpoint, json=camera_update_params)
-                        if resp.ok:
-                            print(f' - HTTP/1.1 {resp.status_code}')
-                        else:
-                            print(f' - HTTP/1.1 {resp.status_code} {resp.json()}')
-                    except Exception as e:
-                        print(f' - {e}')
+                if 'labels' in stored_camera_data and stored_camera_data['labels'] != discovered_labels:
+                    # already discovered
+                    continue
+                else:
+                    stored_camera_data['labels'] = [{
+                        'name': label
+                    } for label in labels]
+                    with open(json_file_name, 'w', encoding='utf-8') as f:
+                        json.dump(stored_camera_data, f)
+
+                    if import_endpoint:
+                        print('Sending the labels to the backend API ', end='', flush=True)
+                        try:
+                            camera_update_params = {
+                                'url': stored_camera_data['rtspUrl'],
+                                'labels': [{
+                                    'name': label
+                                } for label in labels]
+                            }
+                            resp = requests.put(import_endpoint, json=camera_update_params)
+                            if resp.ok:
+                                print(f' - HTTP/1.1 {resp.status_code}')
+                            else:
+                                print(f' - HTTP/1.1 {resp.status_code} {resp.json()}')
+                        except Exception as e:
+                            print(f' - {e}')
+
+
+def main():
+    options = get_arguments()
+
+    model = DeepLabModel(options.model_path)
+
+    if options.daemon:
+        while True:
+            run_model_on_screenshots(model, options.path, options.import_endpoint)
+    else:
+        run_model_on_screenshots(model, options.path, options.import_endpoint)
 
 
 if __name__ == '__main__':
