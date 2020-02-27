@@ -16,18 +16,20 @@ ALL_LABELS = [
     'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tv'
 ]
 
-DEFAULT_NOTIFICATION_SERVER_IP = '10.8.0.2'
+DEFAULT_NOTIFICATION_SERVER_IP = '10.8.0.14'
 DEFAULT_NOTIFICATION_SERVER_PORT = 8080
-
-
 
 notification_server_app = Flask(__name__)
 
+global_notification_callback = None
+
+
 @notification_server_app.route('/notification', methods=['POST'])
 def notification():
-    print(request)
-    return "Thank you very much!"
+    global global_notification_callback
+    global_notification_callback = request.json()
 
+    return "Thank you very much!"
 
 
 def get_arguments():
@@ -46,11 +48,13 @@ def get_arguments():
                              'discovered.')
     parser.add_argument('--notification-server-ip',
                         dest='notification_server_ip',
+                        default=DEFAULT_NOTIFICATION_SERVER_IP,
                         required=False,
                         help=f'An IP address of the notification server to bind to. '
                         f'Default is {DEFAULT_NOTIFICATION_SERVER_IP}')
     parser.add_argument('--notification-server-port',
                         dest='notification_server_port',
+                        default=DEFAULT_NOTIFICATION_SERVER_PORT,
                         required=False,
                         help=f'A TCP port of the notification server to bind to. '
                         f'Default is {DEFAULT_NOTIFICATION_SERVER_PORT}')
@@ -99,6 +103,16 @@ class RtspFileWatcher:
                     if label in stored_label['name']:
                         cameras.append(camera)
         return cameras
+
+    def get_img_file_handler_by_camera_id(self, camera_id):
+        for camera in self.cameras_json_list:
+            if camera_id == camera['cameraId']:
+                return open(f'{camera_id}.jpg', 'rb')
+
+    def get_camera_by_id(self, camera_id):
+        for camera in self.cameras_json_list:
+            if camera_id == camera['cameraId']:
+                return camera
 
 
 rtsp_file_watcher = None
@@ -186,18 +200,48 @@ def monitor(update, context):
                         f"rtsp-url: {camera['rtspUrl']}"
                     update.message.reply_photo(open(img_file, 'rb'), caption=metadata)
 
+
+def start_notification_server(app, ip, port):
+    app.run(host=ip, port=port)
+
+
 @whitelist_only
 def watch(update, context):
     options = get_arguments()
     if not options.notification_server:
-        update.message.reply_text('The RTSP notification server is not enabled. The bot should be restarted with the correct CLI arguments.')
+        update.message.reply_text(
+                    'The RTSP notification server is not enabled. The bot should be restarted with the correct CLI '
+                    'arguments.')
     else:
         update.message.reply_text('Starting the RTSP notification listener.')
-        notification_server_app.run(host=options.notification_server_ip, port=options.notification_server_port)
+
+        notification_server_thread = Thread(target=start_notification_server,
+                                            args=(notification_server_app,
+                                                  options.notification_server_ip,
+                                                  options.notification_server_port))
+        notification_server_thread.start()
         print('The notification server has been started')
 
-    labels = context.args
+        labels = context.args
+        while True:
+            global global_notification_callback
+            if not global_notification_callback:
+                continue
+            else:
+                print('A new notification has been received')
+                camera_id = global_notification_callback['cameraId']
+                received_labels = global_notification_callback['labels']
 
+                if any(label in received_labels for label in labels):
+                    img_file_handler = rtsp_file_watcher.get_img_file_handler_by_camera_id(camera_id)
+
+                    camera = rtsp_file_watcher.get_camera_by_id(camera_id)
+                    metadata = f"camera-id: {camera_id}; " \
+                        f"country: {camera['countryName']}; " \
+                        f"city: {camera['city']}; " \
+                        f"rtsp-url: {camera['rtspUrl']}"
+                    update.message.reply_photo(img_file_handler, caption=metadata)
+                    global_notification_callback = None
 
 
 def error(update, context):
