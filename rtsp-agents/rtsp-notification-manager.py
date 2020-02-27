@@ -245,6 +245,8 @@ def watch(update, context):
                             f"rtsp-url: {camera['rtspUrl']}"
                         update.message.reply_photo(img_file_handler, caption=metadata)
                         global_notification_callback = None
+                    else:
+                        global_notification_callback = None
 
 
 def error(update, context):
