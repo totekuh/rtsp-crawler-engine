@@ -183,7 +183,7 @@ def monitor(update, context):
                     metadata = f"camera-id: {camera_id}; " \
                         f"country: {camera['countryName']}; " \
                         f"city: {camera['city']}; " \
-                        f"rtsp-url: {camera'rtspUrl']}"
+                        f"rtsp-url: {camera['rtspUrl']}"
                     update.message.reply_photo(open(img_file, 'rb'), caption=metadata)
 
 @whitelist_only
