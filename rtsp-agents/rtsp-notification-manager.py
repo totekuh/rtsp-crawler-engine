@@ -110,10 +110,16 @@ def find(update, context):
 
     if not labels:
         update.message.reply_text('Searching all cameras...')
+        found_cameras = {}
         for label in ALL_LABELS:
             cameras_by_label = rtsp_file_watcher.find_by_label(label)
             if cameras_by_label:
-                update.message.reply_text(f'[{label}] - {len(cameras_by_label)} cameras')
+                found_cameras[label] = cameras_by_label
+        if found_cameras:
+            message = ''
+            for label, cameras in found_cameras.items():
+                message += f'{label} - {len(cameras)}\n'
+            update.message.reply_text(message)
         return
     else:
         update.message.reply_text(f'Searching by: [{linesep.join(labels)}]')

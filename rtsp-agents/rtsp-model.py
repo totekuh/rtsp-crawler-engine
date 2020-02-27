@@ -187,7 +187,7 @@ def run_model_on_screenshots(model, path_to_screenshots, import_endpoint=None):
                 } for label in labels]
 
                 if 'labels' in stored_camera_data and stored_camera_data['labels'] != discovered_labels:
-                    # already discovered
+                    # already discovered, nothing to see here
                     continue
                 else:
                     stored_camera_data['labels'] = [{
