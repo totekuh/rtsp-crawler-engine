@@ -236,6 +236,7 @@ def watch(update, context):
                     received_labels = global_notification_callback['labels']
 
                     if any(label in received_labels for label in labels):
+                        print('Matching labels have been found, sending a screenshot')
                         img_file_handler = rtsp_file_watcher.get_img_file_handler_by_camera_id(camera_id)
 
                         camera = rtsp_file_watcher.get_camera_by_id(camera_id)
@@ -246,6 +247,7 @@ def watch(update, context):
                         update.message.reply_photo(img_file_handler, caption=metadata)
                         global_notification_callback = None
                     else:
+                        print('No matching labels have been found')
                         global_notification_callback = None
 
 
