@@ -235,20 +235,21 @@ def watch(update, context):
                     camera_id = global_notification_callback['cameraId']
                     received_labels = global_notification_callback['labels']
 
-                    if any(label in received_labels for label in labels):
-                        print('Matching labels have been found, sending a screenshot')
-                        img_file_handler = rtsp_file_watcher.get_img_file_handler_by_camera_id(camera_id)
+                    for new_label in received_labels:
+                        if new_label['name'] in labels:
+                            print('Matching label was found, sending a screenshot')
+                            img_file_handler = rtsp_file_watcher.get_img_file_handler_by_camera_id(camera_id)
 
-                        camera = rtsp_file_watcher.get_camera_by_id(camera_id)
-                        metadata = f"camera-id: {camera_id}; " \
-                            f"country: {camera['countryName']}; " \
-                            f"city: {camera['city']}; " \
-                            f"rtsp-url: {camera['rtspUrl']}"
-                        update.message.reply_photo(img_file_handler, caption=metadata)
-                        global_notification_callback = None
-                    else:
-                        print('No matching labels have been found')
-                        global_notification_callback = None
+                            camera = rtsp_file_watcher.get_camera_by_id(camera_id)
+                            metadata = f"camera-id: {camera_id}; " \
+                                f"country: {camera['countryName']}; " \
+                                f"city: {camera['city']}; " \
+                                f"rtsp-url: {camera['rtspUrl']}"
+                            update.message.reply_photo(img_file_handler, caption=metadata)
+                            global_notification_callback = None
+                        else:
+                            print('No matching labels have been found')
+                            global_notification_callback = None
 
 
 def error(update, context):
