@@ -37,6 +37,12 @@ def get_arguments():
                         help='The endpoint of the backend API import service. '
                              'If this argument is given, the scripts sends discovered labels '
                              'to the backend API immediately')
+    parser.add_argument('--notification-endpoint',
+                        dest='notification_endpoint',
+                        required=False,
+                        help='The endpoint of the notification server. '
+                             'The notification server receives updates from the model script about the last '
+                             'discovered labels.')
     parser.add_argument('--daemon',
                         action='store_true',
                         required=False,
@@ -168,7 +174,7 @@ def get_all_images_from_path(path):
     return screenshots
 
 
-def run_model_on_screenshots(model, path_to_screenshots, import_endpoint=None):
+def run_model_on_screenshots(model, path_to_screenshots, import_endpoint=None, notification_endpoint=None):
     screenshots = get_all_images_from_path(path_to_screenshots)
     for i, screenshot_path in enumerate(screenshots):
         labels = model.get_labels_from_image_file(image_path=screenshot_path)
@@ -212,6 +218,23 @@ def run_model_on_screenshots(model, path_to_screenshots, import_endpoint=None):
                                 print(f' - HTTP/1.1 {resp.status_code} {resp.json()}')
                         except Exception as e:
                             print(f' - {e}')
+                    if notification_endpoint:
+                        print('Sending a callback to the notification server', end='', flush=True)
+                        try:
+                            camera_update_params = {
+                                'cameraId': stored_camera_data['cameraId'],
+                                'url': stored_camera_data['rtspUrl'],
+                                'labels': [{
+                                    'name': label
+                                } for label in labels]
+                            }
+                            resp = requests.post(notification_endpoint, json=camera_update_params)
+                            if resp.ok:
+                                print(f' - HTTP/1.1 {resp.status_code}')
+                            else:
+                                print(f' - HTTP/1.1 {resp.status_code} {resp.json()}')
+                        except Exception as e:
+                            print(f' - {e}')
 
 
 def main():
@@ -219,11 +242,14 @@ def main():
 
     model = DeepLabModel(options.model_path)
 
+    import_endpoint = options.import_endpoint
+    notification_endpoint = options.notification_endpoint
+
     if options.daemon:
         while True:
-            run_model_on_screenshots(model, options.path, options.import_endpoint)
+            run_model_on_screenshots(model, options.path, import_endpoint, notification_endpoint)
     else:
-        run_model_on_screenshots(model, options.path, options.import_endpoint)
+        run_model_on_screenshots(model, options.path, import_endpoint, notification_endpoint)
 
 
 if __name__ == '__main__':
