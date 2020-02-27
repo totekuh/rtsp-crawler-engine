@@ -223,25 +223,28 @@ def watch(update, context):
         print('The notification server has been started')
 
         labels = context.args
-        while True:
-            global global_notification_callback
-            if not global_notification_callback:
-                continue
-            else:
-                print('A new notification has been received')
-                camera_id = global_notification_callback['cameraId']
-                received_labels = global_notification_callback['labels']
+        if not labels:
+            update.message.reply_text('Please specify a label to watch. Use /help for more info')
+        else:
+            while True:
+                global global_notification_callback
+                if not global_notification_callback:
+                    continue
+                else:
+                    print('Receiving a new notification')
+                    camera_id = global_notification_callback['cameraId']
+                    received_labels = global_notification_callback['labels']
 
-                if any(label in received_labels for label in labels):
-                    img_file_handler = rtsp_file_watcher.get_img_file_handler_by_camera_id(camera_id)
+                    if any(label in received_labels for label in labels):
+                        img_file_handler = rtsp_file_watcher.get_img_file_handler_by_camera_id(camera_id)
 
-                    camera = rtsp_file_watcher.get_camera_by_id(camera_id)
-                    metadata = f"camera-id: {camera_id}; " \
-                        f"country: {camera['countryName']}; " \
-                        f"city: {camera['city']}; " \
-                        f"rtsp-url: {camera['rtspUrl']}"
-                    update.message.reply_photo(img_file_handler, caption=metadata)
-                    global_notification_callback = None
+                        camera = rtsp_file_watcher.get_camera_by_id(camera_id)
+                        metadata = f"camera-id: {camera_id}; " \
+                            f"country: {camera['countryName']}; " \
+                            f"city: {camera['city']}; " \
+                            f"rtsp-url: {camera['rtspUrl']}"
+                        update.message.reply_photo(img_file_handler, caption=metadata)
+                        global_notification_callback = None
 
 
 def error(update, context):
