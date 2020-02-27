@@ -1,0 +1,5 @@
+requests
+flask
+tensorflow
+silence-tensorflow
+opencv-python
