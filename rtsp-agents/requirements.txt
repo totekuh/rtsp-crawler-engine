@@ -3,3 +3,4 @@ flask
 tensorflow
 silence-tensorflow
 opencv-python
+python-telegram-bot
