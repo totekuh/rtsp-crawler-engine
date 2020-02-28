@@ -75,7 +75,7 @@ def get_arguments():
                         help='Optional. Only valid with --search and --daemon arguments.'
                              'The specified value indicates the interval in seconds between updates '
                              'if the script works in the background.'
-                        f'Default is {DEFAULT_SLEEP_TIMER_IN_SECONDS}')
+                             f'Default is {DEFAULT_SLEEP_TIMER_IN_SECONDS}')
     parser.add_argument('--output',
                         dest='output',
                         default=DEFAULT_OUTPUT_DIR,
@@ -94,6 +94,8 @@ def get_arguments():
 
     if options.sleep_timer:
         options.sleep_timer = int(options.sleep_timer)
+    if options.threads:
+        options.threads = int(options.threads)
 
     return options
 
@@ -165,7 +167,13 @@ class RtspBackendClient:
                         'status': updated_camera['status']
                     }
                     json.dump(camera_to_save, f)
-                return self.update_camera(updated_camera)
+                if self.update_camera(updated_camera):
+                    print(f'Health check of the camera [id: {camera["cameraId"]}; '
+                          f'url: {camera["rtspUrl"]}; camera-status: {[camera["status"]]}] has been completed. ')
+                else:
+                    print(f'Health check of the camera [id: {camera["cameraId"]}; '
+                          f'url: {camera["rtspUrl"]}; camera-status: {[camera["status"]]}] has failed. ')
+
             else:
                 updated_camera = {
                     'status': 'UNCONNECTED',
@@ -182,7 +190,12 @@ class RtspBackendClient:
                         'status': 'UNCONNECTED'
                     }
                     json.dump(camera_to_save, f)
-                return self.update_camera(updated_camera)
+                if self.update_camera(updated_camera):
+                    print(f'Health check of the camera [id: {camera["cameraId"]}; '
+                          f'url: {camera["rtspUrl"]}; camera-status: {[camera["status"]]}] has been completed. ')
+                else:
+                    print(f'Health check of the camera [id: {camera["cameraId"]}; '
+                          f'url: {camera["rtspUrl"]}; camera-status: {[camera["status"]]}] has failed. ')
         except Exception as e:
             print(e)
 
@@ -208,22 +221,46 @@ Path(output_dir).mkdir(exist_ok=True)
 rtsp_backend_url = options.rtsp_backend_url
 client = RtspBackendClient(rtsp_backend_url, output_dir)
 
+from threading import Thread
 
-def health_check(cameras):
+from time import sleep
+
+class HealthCheckThread:
+    def __init__(self, camera, rtsp_backend_url, output_dir):
+        self.camera = camera
+        self.rtsp_client = RtspBackendClient(rtsp_backend_url, output_dir)
+        self.thread = Thread(target=self.rtsp_client.health_check, args=(camera,))
+
+    def start(self):
+        self.thread.start()
+
+    def is_alive(self):
+        return self.thread.is_alive()
+
+def health_check(cameras, threads_limit, sleep_timer):
     print(f'Found {len(cameras)} cameras for the health-check')
-    for i, camera in enumerate(cameras):
-        is_updated = client.health_check(camera)
-        if is_updated:
-            print(f'Health check of the camera [id: {camera["cameraId"]}; '
-                  f'url: {camera["rtspUrl"]}; camera-status: {[camera["status"]]}] has been completed. '
-                  f'[{i + 1}/{len(cameras)}]')
-        else:
-            print(f'Health check of the camera [id: {camera["cameraId"]}; '
-                  f'url: {camera["rtspUrl"]}; camera-status: {[camera["status"]]}] has failed. '
-                  f'[{i + 1}/{len(cameras)}]')
+
+    health_check_threads = []
+
+    for camera in cameras:
+        while len(health_check_threads) >= threads_limit:
+            print(f'Health-checker has faced the threads limit, sleeping for {sleep_timer} seconds and continue...')
+            sleep(sleep_timer)
+        camera_thread = HealthCheckThread(camera, rtsp_backend_url, output_dir)
+        health_check_threads.append(camera_thread)
+        camera_thread.start()
+
+    while any(thread.is_alive() for thread in health_check_threads):
+        print(f'Not all threads have finished yet, sleeping for {sleep_timer} seconds and continue...')
+        sleep(sleep_timer)
+
+        for thread in health_check_threads.copy():
+            if not thread.is_alive():
+                health_check_threads.remove(thread)
 
 
-def download_cameras_and_do_health_check(client, threads_limit):
+
+def download_cameras_and_do_health_check(client, threads_limit, sleep_timer):
     print('Downloading a list of camera ids from the backend API')
     camera_ids = client.get_all_camera_ids()
     if not camera_ids:
@@ -237,7 +274,7 @@ def download_cameras_and_do_health_check(client, threads_limit):
         if camera:
             cameras.append(camera)
     if cameras:
-        health_check(cameras)
+        health_check(cameras, threads_limit, sleep_timer)
     else:
         print('No cameras have been passed for the health-check.')
 
@@ -249,11 +286,11 @@ def main(options):
             print('Starting the health-check daemon')
             sleep_timer = options.sleep_timer
             while True:
-                download_cameras_and_do_health_check(client, options.threads)
+                download_cameras_and_do_health_check(client, options.threads, options.sleep_timer)
                 print(f'Sleeping for {sleep_timer} seconds')
                 sleep(sleep_timer)
         else:
-            download_cameras_and_do_health_check(client, options.threads)
+            download_cameras_and_do_health_check(client, options.threads, options.sleep_timer)
 
 
 if __name__ == '__main__':
