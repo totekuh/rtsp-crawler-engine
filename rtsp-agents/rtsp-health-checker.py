@@ -2,8 +2,10 @@
 import base64
 import json
 from pathlib import Path
-from time import sleep
 
+from threading import Thread
+
+from time import sleep
 import cv2
 import requests
 from requests import Session
@@ -46,17 +48,13 @@ def get_arguments():
                         default=DEFAULT_RTSP_BACKEND_URL,
                         required=False,
                         help='Optional. An URL to the backend API. '
-                             f'Default is : {DEFAULT_RTSP_BACKEND_URL}')
+                        f'Default is : {DEFAULT_RTSP_BACKEND_URL}')
 
     ### HEALTH-CHECK EXISTING CAMERAS
-    parser.add_argument('--health-check',
-                        action='store_true',
+    parser.add_argument('--camera-id',
+                        dest='id',
                         required=False,
-                        help='Access the rtsp backend API to retrieve a list of cameras '
-                             'and periodically health check their status. '
-                             'When this argument is given, the script rechecks the status of existing cameras and '
-                             'push back the results of their status to the running server '
-                             'as well as capturing the screenshot and the metadata from the camera.')
+                        help='An identifier of the camera to perform the health-check.')
 
     ### OTHER PROPERTIES
     parser.add_argument('--daemon',
@@ -75,20 +73,20 @@ def get_arguments():
                         help='Optional. Only valid with --search and --daemon arguments.'
                              'The specified value indicates the interval in seconds between updates '
                              'if the script works in the background.'
-                             f'Default is {DEFAULT_SLEEP_TIMER_IN_SECONDS}')
+                        f'Default is {DEFAULT_SLEEP_TIMER_IN_SECONDS}')
     parser.add_argument('--output',
                         dest='output',
                         default=DEFAULT_OUTPUT_DIR,
                         required=False,
                         help='An absolute path to a directory where the screenshots '
                              'and metadata from the cameras should be written.'
-                             f'Default is {DEFAULT_OUTPUT_DIR}')
+                        f'Default is {DEFAULT_OUTPUT_DIR}')
     parser.add_argument('--threads',
                         dest='threads',
                         default=DEFAULT_THREAD_LIMIT,
                         required=False,
                         help='Specify a number of threads to use while performing health-check of the cameras. '
-                             f'Default is {DEFAULT_OUTPUT_DIR}')
+                        f'Default is {DEFAULT_OUTPUT_DIR}')
 
     options = parser.parse_args()
 
@@ -108,15 +106,11 @@ class RtspBackendClient:
         self.rtsp_backend_url = rtsp_backend_url
         self.output_dir = output_dir
 
-    def get_camera(self, camera_id=None, camera_rtsp_url=None):
-        if camera_id and camera_rtsp_url:
-            raise Exception("Stop doing that.")
+    def get_camera(self, camera_id):
         try:
             url = f'{self.rtsp_backend_url}/cameras'
             if camera_id:
                 url = f'{url}?id={camera_id}'
-            if camera_rtsp_url:
-                url = f'{url}?rtspUrl={camera_rtsp_url}'
 
             resp = self.session.get(url)
             if resp.ok:
@@ -142,6 +136,7 @@ class RtspBackendClient:
 
     def health_check(self, camera):
         camera_url = camera['rtspUrl']
+        print(f'Starting the health-check of the camera [id: {camera["cameraId"]}; rtsp-url: {camera_url}]')
         try:
             camera_reader = cv2.VideoCapture(camera_url)
             is_connected, frame = camera_reader.read()
@@ -221,21 +216,28 @@ Path(output_dir).mkdir(exist_ok=True)
 rtsp_backend_url = options.rtsp_backend_url
 client = RtspBackendClient(rtsp_backend_url, output_dir)
 
-from threading import Thread
 
-from time import sleep
+def start_separate_health_check_process(camera_id):
+    import os
+    import sys
+
+    os.system(f'{sys.argv[0]} --camera-id {camera_id}')
+
 
 class HealthCheckThread:
     def __init__(self, camera, rtsp_backend_url, output_dir):
         self.camera = camera
         self.rtsp_client = RtspBackendClient(rtsp_backend_url, output_dir)
-        self.thread = Thread(target=self.rtsp_client.health_check, args=(camera,))
+        self.thread = Thread(target=start_separate_health_check_process, args=(camera['cameraId'],))
+        self.thread_name = f'{camera["cameraId"]}-thread'
 
     def start(self):
         self.thread.start()
+        print(f'{self.thread_name} has started for {self.camera["rtspUrl"]}')
 
     def is_alive(self):
         return self.thread.is_alive()
+
 
 def health_check(cameras, threads_limit, sleep_timer):
     print(f'Found {len(cameras)} cameras for the health-check')
@@ -246,6 +248,10 @@ def health_check(cameras, threads_limit, sleep_timer):
         while len(health_check_threads) >= threads_limit:
             print(f'Health-checker has faced the threads limit, sleeping for {sleep_timer} seconds and continue...')
             sleep(sleep_timer)
+            
+            for thread in health_check_threads.copy():
+                if not thread.is_alive():
+                    health_check_threads.remove(thread)
         camera_thread = HealthCheckThread(camera, rtsp_backend_url, output_dir)
         health_check_threads.append(camera_thread)
         camera_thread.start()
@@ -257,7 +263,6 @@ def health_check(cameras, threads_limit, sleep_timer):
         for thread in health_check_threads.copy():
             if not thread.is_alive():
                 health_check_threads.remove(thread)
-
 
 
 def download_cameras_and_do_health_check(client, threads_limit, sleep_timer):
@@ -280,8 +285,7 @@ def download_cameras_and_do_health_check(client, threads_limit, sleep_timer):
 
 
 def main(options):
-    ### HEALTH-CHECK THE CAMERAS
-    if options.health_check:
+    if not options.id:
         if options.daemon:
             print('Starting the health-check daemon')
             sleep_timer = options.sleep_timer
@@ -291,6 +295,20 @@ def main(options):
                 sleep(sleep_timer)
         else:
             download_cameras_and_do_health_check(client, options.threads, options.sleep_timer)
+    else:
+        # health check a single camera
+        camera_id = options.id
+        rtsp_client = RtspBackendClient(rtsp_backend_url, output_dir)
+        camera = rtsp_client.get_camera(camera_id)
+        if options.daemon:
+            print('Starting the health-check daemon')
+            sleep_timer = options.sleep_timer
+            while True:
+                rtsp_client.health_check(camera)
+                print(f'Sleeping for {sleep_timer} seconds')
+                sleep(sleep_timer)
+        else:
+            rtsp_client.health_check(camera)
 
 
 if __name__ == '__main__':
