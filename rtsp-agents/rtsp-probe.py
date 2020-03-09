@@ -1,13 +1,14 @@
 #!/usr/bin/python3.7
 import base64
 import json
+import socket
 from argparse import ArgumentParser, RawTextHelpFormatter
 from enum import Enum
 
 import cv2
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-
+socket.setdefaulttimeout(3.0)
 
 def get_arguments():
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
@@ -138,11 +139,10 @@ class RtspClient:
 
     def do_connect(self, target, stream=False):
         url = target.url
-        print('Connecting to ' + url)
         self.camera_reader = cv2.VideoCapture(url)
         is_connected, frame = self.camera_reader.read()
         if is_connected:
-            print('Connected.')
+            print(f'Connected to {url}.')
 
             # convert the captured frame to a base64 string
             cv2.imwrite('capture.jpg', frame)
@@ -172,7 +172,7 @@ class RtspClient:
                     else:
                         target.keywords.update(k.split(','))
         else:
-            print('Connection failed.')
+            print(f'Connection failed to {url}.')
 
     def lookup(self, target, stream=False):
         self.do_connect(target, stream)
@@ -195,7 +195,8 @@ class RtspClient:
                                    headers={
                                        "Content-Type": "application/json"
                                    })
-            print(f'Camera [{target.url}] import API response: \n{response.status_code}\n{response.text}')
+            if response.ok:
+                print(f'Camera [{target.url}] has been imported to the backend API')
         except Exception as e:
             if 'refused' in str(e):
                 print('Backend API is not responding. Is there a reachable server?')
