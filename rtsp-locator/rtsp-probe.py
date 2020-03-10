@@ -9,6 +9,7 @@ import cv2
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 socket.setdefaulttimeout(3.0)
+DEFAULT_THREAD_LIMIT = 10
 
 def get_arguments():
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
@@ -34,6 +35,10 @@ def get_arguments():
     parser.add_argument('-k', '--keywords', action='store_true',
                         help='Optional. Send specified keywords to mark your camera. A set of keywords would be '
                              'printed during camera lookup.')
+    parser.add_argument('--threads',
+                        dest='threads',
+                        required=False,
+                        help='Specify a number of threads to use while probing the cameras.')
     options = parser.parse_args()
     if not options.url and not options.batch_json_file and not options.batch_list_file:
         parser.error('URL to the RTSP stream or a batch json/list file must be specified. Use --help for more info.')
@@ -205,6 +210,8 @@ class RtspClient:
 
 
 options = get_arguments()
+
+threads_limit = options.threads
 
 rtsp_client = RtspClient(
     options.output,

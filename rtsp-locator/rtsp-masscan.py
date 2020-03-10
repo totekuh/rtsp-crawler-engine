@@ -59,7 +59,6 @@ def convert(input_file):
         for port in res["ports"]:
             address = f'rtsp://{res["ip"]}:{port["port"]}'
             url_to_cameras.append(address)
-    print(f'{len(url_to_cameras)} targets')
     return url_to_cameras
 
 
@@ -70,11 +69,9 @@ def save(url_to_cameras, output_file):
 
 
 options = get_arguments()
-result_file = options.file
-if options.ip_range:
-    result_file = do_masscan(options.ip_range)
-    if not result_file:
-        print('Masscan has failed to get the cameras')
-        exit(1)
+result_file = do_masscan(options.ip_range)
+if not result_file:
+    print('Masscan has failed to get the cameras')
+    exit(1)
 addresses = convert(result_file)
 save(addresses, options.output)

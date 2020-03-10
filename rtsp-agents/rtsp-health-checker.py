@@ -2,10 +2,9 @@
 import base64
 import json
 from pathlib import Path
-
 from threading import Thread
-
 from time import sleep
+
 import cv2
 import requests
 from requests import Session
@@ -25,16 +24,6 @@ camera_statuses = [
     'NOT_FOUND',
     # The RTSP stream doesn't exist or the server has refused to connect.
     'UNCONNECTED'
-]
-
-camera_keywords = [
-    'HOT',
-    'WOMAN',
-    'MAN',
-    'CHILDREN',
-    'CREEPY',
-    'AUTISTIC',
-    'SLAVERY'
 ]
 
 
@@ -86,7 +75,7 @@ def get_arguments():
                         default=DEFAULT_THREAD_LIMIT,
                         required=False,
                         help='Specify a number of threads to use while performing health-check of the cameras. '
-                        f'Default is {DEFAULT_OUTPUT_DIR}')
+                        f'Default is {DEFAULT_THREAD_LIMIT}')
 
     options = parser.parse_args()
 
@@ -248,7 +237,7 @@ def health_check(cameras, threads_limit, sleep_timer):
         while len(health_check_threads) >= threads_limit:
             print(f'Health-checker has faced the threads limit, sleeping for {sleep_timer} seconds and continue...')
             sleep(sleep_timer)
-            
+
             for thread in health_check_threads.copy():
                 if not thread.is_alive():
                     health_check_threads.remove(thread)
