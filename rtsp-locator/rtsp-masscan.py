@@ -33,22 +33,22 @@ def do_masscan(ip_range):
         ip_range = f'-iL {ip_range}'
 
     command = f'masscan {ip_range} -p{port} -oJ ./{masscan_result_file} --rate {rate}'
-    print('Starting a masscan')
     try:
         subprocess.check_call(command.split(' '))
         print('Masscan has finished')
         return masscan_result_file
     except Exception as e:
-        print(f'Unexpected error during masscan: {e}')
+        print(f'Unexpected error during the masscan: {e}')
 
 
 def convert(input_file):
     url_to_cameras = []
     masscan_results = []
     try:
-        masscan_results = [res.replace('\n', '') for res in open(input_file, 'r').readlines() if 'ip' in res]
+        with open(input_file, 'r') as f:
+            masscan_results = [res.strip() for res in f.readlines() if 'ip' in res]
     except Exception as e:
-        print(f'Unexpected error while reading masscan results: {e}')
+        print(f'Unexpected error while reading the masscan results: {e}')
         exit(1)
     for target in masscan_results:
         if 'finished' in target:
