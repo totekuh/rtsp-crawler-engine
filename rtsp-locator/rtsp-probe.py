@@ -4,12 +4,25 @@ import json
 import socket
 from argparse import ArgumentParser, RawTextHelpFormatter
 from enum import Enum
+from threading import Thread
 
 import cv2
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 socket.setdefaulttimeout(3.0)
 DEFAULT_THREAD_LIMIT = 10
+
+
+def start_separate_probe_process(camera_url, import_endpoint=None):
+    import os
+    import sys
+
+    if import_endpoint:
+        import_endpoint = f'--import {import_endpoint}'
+    else:
+        import_endpoint = ''
+    os.system(f'{sys.argv[0]} --url {camera_url} {import_endpoint}')
+
 
 def get_arguments():
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
@@ -37,6 +50,7 @@ def get_arguments():
                              'printed during camera lookup.')
     parser.add_argument('--threads',
                         dest='threads',
+                        type=int,
                         required=False,
                         help='Specify a number of threads to use while probing the cameras.')
     options = parser.parse_args()
@@ -61,6 +75,7 @@ class RtspClient:
         self.do_review_comment = do_review_comment
         self.use_keywords = use_keywords
 
+
     class Target:
         class Keyword(Enum):
             HOT = 0,
@@ -71,11 +86,13 @@ class RtspClient:
             AUTISTIC = 5,
             SLAVERY = 6
 
+
         class CameraStatus(Enum):
             UNCONNECTED = 0,
             NOT_FOUND = 1,
             UNAUTHORIZED = 2,
             OPEN = 3
+
 
         def __init__(self, url, ip=None, port=None, country_name=None, isp=None, country_code=None,
                      city=None, comment=None):
@@ -111,36 +128,41 @@ class RtspClient:
                 }
             return target
 
+
     def batch_json(self, batch_json_file):
+        cameras_to_lookup = []
         with open(batch_json_file, 'r', encoding='utf-8') as batch_json:
             targets = [line.replace('\n', '') for line in batch_json.readlines()]
             for target in targets:
                 res = json.loads(target)
                 ip_camera = RtspClient.Target(
-                    url=f'rtsp://{res["ip_str"]}:{res["port"]}',
-                    ip=res['ip_str'],
-                    port=res['port'],
-                    isp=res['isp'],
-                    country_name=res['location']['country_name'],
-                    country_code=res['location']['country_code'],
-                    city=res['location']['city'])
-                self.lookup(ip_camera)
+                            url=f'rtsp://{res["ip_str"]}:{res["port"]}',
+                            ip=res['ip_str'],
+                            port=res['port'],
+                            isp=res['isp'],
+                            country_name=res['location']['country_name'],
+                            country_code=res['location']['country_code'],
+                            city=res['location']['city'])
+                cameras_to_lookup.append(ip_camera)
+        return cameras_to_lookup
 
     def batch_list(self, batch_list_file):
+        cameras_to_lookup = []
         with open(batch_list_file, 'r', encoding='utf-8') as batch_json:
             targets = [line.replace('\n', '') for line in batch_json.readlines()]
             for target in targets:
                 ip = target.split('://')[1].split(':')[0]
                 port = target.split('://')[1].split(':')[1]
                 ip_camera = RtspClient.Target(
-                    url=target,
-                    ip=ip,
-                    port=port,
-                    isp=None,
-                    country_name=None,
-                    country_code=None,
-                    city=None)
-                self.lookup(ip_camera)
+                            url=target,
+                            ip=ip,
+                            port=port,
+                            isp=None,
+                            country_name=None,
+                            country_code=None,
+                            city=None)
+                cameras_to_lookup.append(ip_camera)
+        return cameras_to_lookup
 
     def do_connect(self, target, stream=False):
         url = target.url
@@ -194,6 +216,7 @@ class RtspClient:
     def send(self, target):
         try:
             import requests
+
             session = requests.Session()
             response = session.put(url=self.import_endpoint,
                                    json=target.to_dict(),
@@ -210,18 +233,42 @@ class RtspClient:
 
 
 options = get_arguments()
+import_endpoint = options.import_url
 
 threads_limit = options.threads
 
 rtsp_client = RtspClient(
-    options.output,
-    import_endpoint=options.import_url,
-    do_review_comment=options.commentary,
-    use_keywords=options.keywords)
+            options.output,
+            import_endpoint=import_endpoint,
+            do_review_comment=options.commentary,
+            use_keywords=options.keywords)
 if not options.url:
+    cameras_to_lookup = []
     if options.batch_json_file:
-        rtsp_client.batch_json(options.batch_json_file)
+        cameras_to_lookup = rtsp_client.batch_json(options.batch_json_file)
     if options.batch_list_file:
-        rtsp_client.batch_list(options.batch_list_file)
+        cameras_to_lookup = rtsp_client.batch_list(options.batch_list_file)
+    if cameras_to_lookup:
+        if options.threads:
+            threads_limit = options.threads
+
+            probe_threads = []
+
+            for camera in cameras_to_lookup:
+                while len(probe_threads) >= threads_limit:
+                    for thread in probe_threads.copy():
+                        if not thread.is_alive():
+                            probe_threads.remove(thread)
+
+                probe_thread = Thread(target=start_separate_probe_process,
+                                      args=(camera.url, import_endpoint))
+                probe_threads.append(probe_thread)
+                probe_thread.start()
+            while any(thread.is_alive() for thread in probe_threads):
+                pass
+        else:
+            for camera in cameras_to_lookup:
+                rtsp_client.lookup(camera)
+
 else:
     rtsp_client.lookup(RtspClient.Target(url=options.url), stream=options.stream)
