@@ -65,7 +65,8 @@ def get_arguments():
 
 
 class RtspClient:
-    def __init__(self, output_file, import_endpoint=None):
+    def __init__(self, output_file,
+                 import_endpoint=None):
         self.camera_reader = None
         self.output_file = output_file
         self.import_endpoint = import_endpoint
@@ -86,8 +87,13 @@ class RtspClient:
             UNAUTHORIZED = 2,
             OPEN = 3
 
-        def __init__(self, url, ip=None, port=None, country_name=None, isp=None, country_code=None,
-                     city=None, comment=None):
+        def __init__(self, url,
+                     ip=None,
+                     port=None,
+                     country_name=None,
+                     isp=None,
+                     country_code=None,
+                     city=None):
             self.url = url
             self.ip = ip
             self.port = port
@@ -96,8 +102,6 @@ class RtspClient:
             self.country_code = country_code
             self.city = city
             self.status = self.CameraStatus.UNCONNECTED
-            self.comment = comment
-            self.keywords = set()
             self.base64_image_data = None
 
         def print_all_keywords(self):
@@ -112,18 +116,15 @@ class RtspClient:
                     'status': self.status.name,
                     'countryCode': self.country_code,
                     'countryName': self.country_name,
-                    'comment': self.comment,
-                    'keywords': list(self.keywords),
                     'city': self.city,
-                    'isp': self.isp,
-                    'base64ImageData': self.base64_image_data
+                    'isp': self.isp
                 }
             return target
 
     def shodan_to_cameras_list(self, batch_json_file):
         cameras_to_lookup = []
         with open(batch_json_file, 'r', encoding='utf-8') as batch_json:
-            targets = [line.replace('\n', '') for line in batch_json.readlines()]
+            targets = [line.strip() for line in batch_json.readlines()]
             for target in targets:
                 res = json.loads(target)
                 ip_camera = RtspClient.Target(
@@ -140,7 +141,7 @@ class RtspClient:
     def file_list_to_cameras_list(self, batch_list_file):
         cameras_to_lookup = []
         with open(batch_list_file, 'r', encoding='utf-8') as batch_json:
-            targets = [line.replace('\n', '') for line in batch_json.readlines()]
+            targets = [line.strip() for line in batch_json.readlines()]
             for target in targets:
                 ip = target.split('://')[1].split(':')[0]
                 port = target.split('://')[1].split(':')[1]
