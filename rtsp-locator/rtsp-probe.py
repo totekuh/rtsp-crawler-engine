@@ -176,7 +176,7 @@ class RtspClient:
     def lookup(self, target, stream=False):
         self.do_connect(target, stream)
         self.dump(target)
-        if self.import_endpoint:
+        if self.import_endpoint and target.status.name == 'OPEN':
             self.send(target)
 
     def dump(self, target):
