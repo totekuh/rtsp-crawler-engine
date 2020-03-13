@@ -2,6 +2,8 @@
 import json
 import os
 import tarfile
+from time import sleep
+
 
 import numpy as np
 import requests
@@ -15,7 +17,7 @@ if silence_tensorflow:
     pass
 
 DEFAULT_MODEL_PATH = './models/'
-
+DEFAULT_SLEEP_TIMER_IN_SECONDS = 60
 
 def get_arguments():
     from argparse import ArgumentParser
@@ -49,6 +51,13 @@ def get_arguments():
                         help='Send the script to work in the background. '
                              'During the work, the script periodically rescans '
                              'to update the screenshots from cameras and publish new labels. ')
+    parser.add_argument('--sleep-timer',
+                        dest='sleep_timer',
+                        default=DEFAULT_SLEEP_TIMER_IN_SECONDS,
+                        type=int,
+                        required=False,
+                        help='Specify a sleep timer in seconds between the checks. '
+                             f'Default is {DEFAULT_SLEEP_TIMER_IN_SECONDS}')
     options = parser.parse_args()
 
     return options
@@ -246,8 +255,11 @@ def main():
     notification_endpoint = options.notification_endpoint
 
     if options.daemon:
+        sleep_timer = options.sleep_timer
         while True:
             run_model_on_screenshots(model, options.path, import_endpoint, notification_endpoint)
+            print(f'Sleeping for {sleep_timer} seconds')
+            sleep(sleep_timer)
     else:
         run_model_on_screenshots(model, options.path, import_endpoint, notification_endpoint)
 
