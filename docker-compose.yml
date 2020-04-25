@@ -14,14 +14,22 @@ services:
     depends_on:
       - rtsp-mariadb
     restart: always
-    build: .
+    build: ./rtsp-backend
     ports:
       - '80'
     expose:
       - '80'
-    working_dir: /rtsp-backend
+    working_dir: '/rtsp-backend'
     entrypoint: '/bin/bash wait-for rtsp-mariadb:3306 -t 0 -- java -jar cameras.jar'
     environment:
       - spring.datasource.url=jdbc:mariadb://rtsp-mariadb:3306/cameras_db
       - spring.datasource.username=root
       - spring.datasource.password=SuperDuperSecretPass666
+
+#  rtsp-locator:
+#    depends_on:
+#      - rtsp-mariadb
+#      - rtsp-backend
+#    restart: always
+#    build: ./rtsp-locator
+#    entrypoint: '/bin/bash /rtsp-backend/wait-for rtsp-mariadb:3306 -t 0 -- java -jar cameras.jar'
