@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  rtsp-mariadb:
+    restart: always
+    image: mariadb:latest
+    ports:
+      - '3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=SuperDuperSecretPass666
+      - MYSQL_DATABASE=camerasdb
+      - MYSQL_ROOT_HOST=%
+
+  rtsp-backend:
+    depends_on:
+      - rtsp-mariadb
+    restart: always
+    build: .
+    ports:
+      - '80'
+    expose:
+      - '80'
+    working_dir: /rtsp-backend
+    entrypoint: '/bin/bash wait-for rtsp-mariadb:3306 -t 0 -- java -jar cameras.jar'
+    environment:
+      - spring.datasource.url=jdbc:mariadb://rtsp-mariadb:3306/camerasdb
+      - spring.datasource.username=root
+      - spring.datasource.password=SuperDuperSecretPass666
