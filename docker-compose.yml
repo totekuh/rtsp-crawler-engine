@@ -16,9 +16,9 @@ services:
     restart: always
     build: ./rtsp-backend
     ports:
-      - '80'
+      - '8080:8080'
     expose:
-      - '80'
+      - '8080'
     working_dir: '/rtsp-backend'
     entrypoint: '/bin/bash wait-for rtsp-mariadb:3306 -t 0 -- java -jar cameras.jar'
     environment:
@@ -26,10 +26,10 @@ services:
       - spring.datasource.username=root
       - spring.datasource.password=SuperDuperSecretPass666
 
-#  rtsp-locator:
-#    depends_on:
-#      - rtsp-mariadb
-#      - rtsp-backend
-#    restart: always
-#    build: ./rtsp-locator
-#    entrypoint: '/bin/bash /rtsp-backend/wait-for rtsp-mariadb:3306 -t 0 -- java -jar cameras.jar'
+  rtsp-locator:
+    depends_on:
+      - rtsp-mariadb
+      - rtsp-backend
+    build: ./rtsp-locator
+    working_dir: /rtsp-locator
+    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-locator/rtsp-spyglass.py --import-endpoint http://rtsp-backend:8080/cameras/import'
