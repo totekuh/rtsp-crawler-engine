@@ -9,6 +9,3 @@ RUN pip3 install -r /rtsp-neural-network/requirements.txt
 
 
 COPY ./rtsp-model.py /rtsp-neural-network/
-
-# download a neural network model
-RUN python3 -u /rtsp-neural-network/rtsp-model.py

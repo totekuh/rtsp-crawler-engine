@@ -256,6 +256,7 @@ def main():
 
     if not options.path:
         DeepLabModel.download(options.model_path)
+        return
     else:
         model = DeepLabModel(options.model_path)
 
