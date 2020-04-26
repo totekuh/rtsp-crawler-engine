@@ -4,7 +4,6 @@ import os
 import tarfile
 from time import sleep
 
-
 import numpy as np
 import requests
 import silence_tensorflow
@@ -19,13 +18,14 @@ if silence_tensorflow:
 DEFAULT_MODEL_PATH = './models/'
 DEFAULT_SLEEP_TIMER_IN_SECONDS = 60
 
+
 def get_arguments():
     from argparse import ArgumentParser
 
     parser = ArgumentParser()
     parser.add_argument('--path',
                         dest='path',
-                        required=True,
+                        required=False,
                         help='A path to a folder with stored screenshots from cameras.')
     parser.add_argument('--model-path',
                         dest='model_path',
@@ -57,7 +57,7 @@ def get_arguments():
                         type=int,
                         required=False,
                         help='Specify a sleep timer in seconds between the checks. '
-                             f'Default is {DEFAULT_SLEEP_TIMER_IN_SECONDS}')
+                        f'Default is {DEFAULT_SLEEP_TIMER_IN_SECONDS}')
     options = parser.parse_args()
 
     return options
@@ -98,16 +98,21 @@ class DeepLabModel(object):
     INPUT_SIZE = 513
     FROZEN_GRAPH_NAME = 'frozen_inference_graph'
 
-    def __init__(self, model_dir):
-        """Creates and loads pretrained deeplab model."""
-        self.graph = tf.Graph()
-        tf.gfile.MakeDirs(model_dir)
+    @staticmethod
+    def download(model_dir):
         tarball_path = os.path.join(model_dir, MODEL_NAME + _TARBALL_NAME)
         if not os.path.exists(tarball_path):
             print('Downloading the training model, this might take a while')
             urllib.request.urlretrieve(_DOWNLOAD_URL_PREFIX + _MODEL_URLS[MODEL_NAME],
                                        tarball_path)
             print('Downloading has been completed')
+        return tarball_path
+
+    def __init__(self, model_dir):
+        """Creates and loads pretrained deeplab model."""
+        self.graph = tf.Graph()
+        tf.io.gfile.makedirs(model_dir)
+        tarball_path = self.download(model_dir)
 
         print('Starting the training model')
 
@@ -249,19 +254,22 @@ def run_model_on_screenshots(model, path_to_screenshots, import_endpoint=None, n
 def main():
     options = get_arguments()
 
-    model = DeepLabModel(options.model_path)
-
-    import_endpoint = options.import_endpoint
-    notification_endpoint = options.notification_endpoint
-
-    if options.daemon:
-        sleep_timer = options.sleep_timer
-        while True:
-            run_model_on_screenshots(model, options.path, import_endpoint, notification_endpoint)
-            print(f'Sleeping for {sleep_timer} seconds')
-            sleep(sleep_timer)
+    if not options.path:
+        DeepLabModel.download(options.model_path)
     else:
-        run_model_on_screenshots(model, options.path, import_endpoint, notification_endpoint)
+        model = DeepLabModel(options.model_path)
+
+        import_endpoint = options.import_endpoint
+        notification_endpoint = options.notification_endpoint
+
+        if options.daemon:
+            sleep_timer = options.sleep_timer
+            while True:
+                run_model_on_screenshots(model, options.path, import_endpoint, notification_endpoint)
+                print(f'Sleeping for {sleep_timer} seconds')
+                sleep(sleep_timer)
+        else:
+            run_model_on_screenshots(model, options.path, import_endpoint, notification_endpoint)
 
 
 if __name__ == '__main__':

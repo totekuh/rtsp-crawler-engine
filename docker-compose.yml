@@ -40,4 +40,27 @@ services:
       - rtsp-backend
     build: ./rtsp-health-checker
     working_dir: /rtsp-health-check
+    volumes:
+      - ./rtsp-health-checker:/rtsp-heath-check
     entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-health-check/rtsp-health-checker.py --sleep-timer 60 --rtsp-backend-url http://rtsp-backend:8080/ --daemon'
+
+  #  rtsp-notification:
+  #    depends_on:
+  #      - rtsp-mariadb
+  #      - rtsp-backend
+  #    build: ./rtsp-health-checker
+  #    working_dir: /rtsp-health-check
+  #    volumes:
+  #      - ./rtsp-health-checker:/rtsp-heath-check
+  #    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-health-check/rtsp-health-checker.py --sleep-timer 60 --rtsp-backend-url http://rtsp-backend:8080/ --daemon'
+
+  rtsp-neural-network:
+    depends_on:
+      - rtsp-mariadb
+      - rtsp-backend
+    build: ./rtsp-neural-network
+    working_dir: /rtsp-neural-network
+    volumes:
+      - ./rtsp-health-check:/rtsp-health-check
+      - ./rtsp-neural-network:/rtsp-neural-network
+    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-neural-network/rtsp-model.py --path /rtsp-health-check/health-check --import-endpoint http://rtsp-backend:8080/cameras/import --daemon'

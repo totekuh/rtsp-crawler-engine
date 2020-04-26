@@ -1,0 +1,4 @@
+tensorflow
+silence-tensorflow
+requests
+Pillow
