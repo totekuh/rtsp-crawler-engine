@@ -32,7 +32,7 @@ services:
       - rtsp-backend
     build: ./rtsp-locator
     working_dir: /rtsp-locator
-    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-locator/rtsp-spyglass.py --country-code CZ --import-endpoint http://rtsp-backend:8080/cameras/import'
+    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-locator/rtsp-spyglass.py --country-code $COUNTRY_CODE --import-endpoint http://rtsp-backend:8080/cameras/import'
 
   rtsp-health-checker:
     depends_on:
