@@ -9,4 +9,3 @@ COPY requirements.txt /rtsp-health-check
 RUN pip3 install -r /rtsp-health-check/requirements.txt
 
 COPY rtsp-health-checker.py /rtsp-health-check
-VOLUME . /rtsp-health-check
