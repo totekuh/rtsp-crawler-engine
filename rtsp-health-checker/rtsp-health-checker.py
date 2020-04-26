@@ -91,6 +91,7 @@ class RtspBackendClient:
         self.session = Session()
         self.rtsp_backend_url = rtsp_backend_url
         self.output_dir = output_dir
+        Path(self.output_dir).mkdir(exist_ok=True)
 
     def get_camera(self, camera_id):
         try:
@@ -196,8 +197,6 @@ class RtspBackendClient:
 
 options = get_arguments()
 output_dir = options.output
-
-Path(output_dir).mkdir(exist_ok=True)
 
 rtsp_backend_url = options.rtsp_backend_url
 client = RtspBackendClient(rtsp_backend_url, output_dir)
