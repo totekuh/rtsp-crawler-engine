@@ -44,7 +44,7 @@ public class DeleteUnconnectedCamerasBackgroundJob {
                     });
                     log.info("Deletion job has finished successfully.");
                 } else {
-                    log.info("No unconnected cameras have been received for the deletion");
+                    log.info("No unconnected cameras have been received for the deletion job");
                 }
                 log.info("Sleeping for the {} minutes", (SLEEPING_TIMER_IN_MS / 1000) / 60);
                 try {

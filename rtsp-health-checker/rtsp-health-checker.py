@@ -58,6 +58,7 @@ def get_arguments():
     parser.add_argument('--sleep-timer',
                         dest='sleep_timer',
                         default=DEFAULT_SLEEP_TIMER_IN_SECONDS,
+                        type=int,
                         required=False,
                         help='Optional. Only valid with --search and --daemon arguments.'
                              'The specified value indicates the interval in seconds between updates '
@@ -73,16 +74,12 @@ def get_arguments():
     parser.add_argument('--threads',
                         dest='threads',
                         default=DEFAULT_THREAD_LIMIT,
+                        type=int,
                         required=False,
                         help='Specify a number of threads to use while performing health-check of the cameras. '
                         f'Default is {DEFAULT_THREAD_LIMIT}')
 
     options = parser.parse_args()
-
-    if options.sleep_timer:
-        options.sleep_timer = int(options.sleep_timer)
-    if options.threads:
-        options.threads = int(options.threads)
 
     return options
 
@@ -258,19 +255,19 @@ def download_cameras_and_do_health_check(client, threads_limit, sleep_timer):
     print('Downloading a list of camera ids from the backend API')
     camera_ids = client.get_all_camera_ids()
     if not camera_ids:
-        print('No cameras have been downloaded from the backend API')
+        print('The backend API has responded with an empty list of cameras')
     else:
         print(f'{len(camera_ids)} camera ids have been discovered')
-    cameras = []
-    for i, camera_id in enumerate(camera_ids):
-        print(f'Asking the backend API about the camera [{i + 1}/{len(camera_ids)}]')
-        camera = client.get_camera(camera_id)
-        if camera:
-            cameras.append(camera)
-    if cameras:
-        health_check(cameras, threads_limit, sleep_timer)
-    else:
-        print('No cameras have been passed for the health-check.')
+        cameras = []
+        for i, camera_id in enumerate(camera_ids):
+            print(f'Asking the backend API about the camera [{i + 1}/{len(camera_ids)}]')
+            camera = client.get_camera(camera_id)
+            if camera:
+                cameras.append(camera)
+        if cameras:
+            health_check(cameras, threads_limit, sleep_timer)
+        else:
+            print('No cameras have been passed for the health-check.')
 
 
 def main(options):
