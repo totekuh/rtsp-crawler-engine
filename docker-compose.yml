@@ -42,4 +42,4 @@ services:
     working_dir: /rtsp-health-check
     volumes:
       - '$PWD:/rtsp-health-checker'
-    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-health-check/rtsp-health-checker.py --rtsp-backend-url http://rtsp-backend:8080/ --daemon'
+    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-health-check/rtsp-health-checker.py --sleep-timer 60 --rtsp-backend-url http://rtsp-backend:8080/ --daemon'
