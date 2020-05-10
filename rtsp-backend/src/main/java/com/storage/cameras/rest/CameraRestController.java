@@ -11,6 +11,7 @@ import com.storage.cameras.mapper.CameraToResourceMapper;
 import com.storage.cameras.mapper.LabelToResourceMapper;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.rest.params.PostCameraParams;
+import com.storage.cameras.rest.params.ScanCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
 import com.storage.cameras.rest.resource.CameraIdentifiersResource;
 import com.storage.cameras.rest.resource.CameraResource;
@@ -41,8 +42,15 @@ public class CameraRestController {
 
     private final CameraService cameraService;
     private final LabelService labelService;
+
     private final CameraToResourceMapper cameraToResourceMapper = CameraToResourceMapper.INSTANCE;
     private final LabelToResourceMapper labelToResourceMapper = LabelToResourceMapper.INSTANCE;
+
+    @PostMapping(value = "/scan", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity scan(@RequestBody final ScanCameraParams params) {
+        log.info("Scanning a new camera: {}:{}", params.getIpAddress(), params.getPort());
+        return ok(cameraService.scan(params));
+    }
 
     @PutMapping(value = "/import", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity receive(@RequestBody final PostCameraParams params) {

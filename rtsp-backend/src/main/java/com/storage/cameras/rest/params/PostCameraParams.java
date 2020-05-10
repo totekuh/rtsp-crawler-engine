@@ -3,10 +3,12 @@ package com.storage.cameras.rest.params;
 import com.storage.cameras.model.CameraStatus;
 import java.util.List;
 import javax.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 import static com.storage.cameras.model.Camera.MAX_COMMENT_LENGTH;
 
 @Data
+@Builder
 public class PostCameraParams {
 
     private CameraStatus status;

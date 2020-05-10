@@ -25,24 +25,25 @@ services:
       - spring.datasource.url=jdbc:mariadb://rtsp-mariadb:3306/cameras_db
       - spring.datasource.username=root
       - spring.datasource.password=SuperDuperSecretPass666
+      - TELEGRAM_BOT_TOKEN=zhopa
 
-  rtsp-locator:
-    depends_on:
-      - rtsp-mariadb
-      - rtsp-backend
-    build: ./rtsp-locator
-    working_dir: /rtsp-locator
-    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-locator/rtsp-spyglass.py --country-code $COUNTRY_CODE --import-endpoint http://rtsp-backend:8080/cameras/import'
-
-  rtsp-health-checker:
-    depends_on:
-      - rtsp-mariadb
-      - rtsp-backend
-    build: ./rtsp-health-checker
-    working_dir: /rtsp-health-check
-    volumes:
-      - ./rtsp-health-checker:/rtsp-heath-check
-    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-health-check/rtsp-health-checker.py --sleep-timer 60 --rtsp-backend-url http://rtsp-backend:8080/ --daemon'
+  #  rtsp-locator:
+  #    depends_on:
+  #      - rtsp-mariadb
+  #      - rtsp-backend
+  #    build: ./rtsp-locator
+  #    working_dir: /rtsp-locator
+  #    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-locator/rtsp-spyglass.py --country-code $COUNTRY_CODE --import-endpoint http://rtsp-backend:8080/cameras/import'
+  #
+  #  rtsp-health-checker:
+  #    depends_on:
+  #      - rtsp-mariadb
+  #      - rtsp-backend
+  #    build: ./rtsp-health-checker
+  #    working_dir: /rtsp-health-check
+  #    volumes:
+  #      - ./rtsp-health-checker:/rtsp-heath-check
+  #    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-health-check/rtsp-health-checker.py --sleep-timer 60 --rtsp-backend-url http://rtsp-backend:8080/ --daemon'
 
   #  rtsp-notification:
   #    depends_on:
@@ -54,13 +55,13 @@ services:
   #      - ./rtsp-health-checker:/rtsp-heath-check
   #    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-health-check/rtsp-health-checker.py --sleep-timer 60 --rtsp-backend-url http://rtsp-backend:8080/ --daemon'
 
-  rtsp-neural-network:
-    depends_on:
-      - rtsp-mariadb
-      - rtsp-backend
-    build: ./rtsp-neural-network
-    working_dir: /rtsp-neural-network
-    volumes:
-      - ./rtsp-health-check:/rtsp-health-check
-      - ./rtsp-neural-network:/rtsp-neural-network
-    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-neural-network/rtsp-model.py --path /rtsp-health-check/health-check --import-endpoint http://rtsp-backend:8080/cameras/import --daemon'
+#  rtsp-neural-network:
+#    depends_on:
+#      - rtsp-mariadb
+#      - rtsp-backend
+#    build: ./rtsp-neural-network
+#    working_dir: /rtsp-neural-network
+#    volumes:
+#      - ./rtsp-health-check:/rtsp-health-check
+##      - ./rtsp-neural-network:/rtsp-neural-network
+#    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-neural-network/rtsp-model.py --path /rtsp-health-check/health-check --import-endpoint http://rtsp-backend:8080/cameras/import --daemon'

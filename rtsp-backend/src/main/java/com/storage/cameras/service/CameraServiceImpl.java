@@ -1,22 +1,29 @@
 package com.storage.cameras.service;
 
+import static com.storage.cameras.model.CameraStatus.OPEN;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 import com.storage.cameras.dao.CameraDao;
 import com.storage.cameras.dao.CommentDao;
+import com.storage.cameras.exception.UnprocessableCameraException;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.model.Comment;
 import com.storage.cameras.model.Label;
 import com.storage.cameras.rest.params.LabelParams;
 import com.storage.cameras.rest.params.PostCameraParams;
+import com.storage.cameras.rest.params.ScanCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
-import static java.lang.String.format;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.List;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.springframework.stereotype.Service;
-import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -27,6 +34,41 @@ public class CameraServiceImpl implements CameraService {
     private final CameraDao cameraDao;
     private final CommentDao commentDao;
     private final LabelService labelService;
+
+    @Override
+    public Camera scan(ScanCameraParams scanCameraParams) {
+        final String ipAddress = scanCameraParams.getIpAddress();
+        final int port = scanCameraParams.getPort();
+
+        if (isBlank(ipAddress) || port == 0) {
+            throw new IllegalArgumentException("An invalid target to scan");
+        } else {
+            try {
+                Socket socket = new Socket();
+                socket.connect(new InetSocketAddress(ipAddress, port), 5000);
+                socket.close();
+                final String cameraUrl = format("rtsp://%s:%s", ipAddress, port);
+                log.info("A possible camera has been detected at {}", cameraUrl);
+
+                return cameraDao.updateOrCreateCamera(PostCameraParams.builder()
+                        .url(cameraUrl)
+                        .status(OPEN)
+                        .build());
+            } catch (Exception ex) {
+                log.warn("RTSP stream [{}:{}] is closed: {}", ipAddress, port, ex.getMessage());
+                throw new UnprocessableCameraException();
+            }
+        }
+    }
+
+    @Override
+    public List<Camera> scanAll(List<ScanCameraParams> scanCameraParamsList) {
+        return scanCameraParamsList
+                .stream()
+                .parallel()
+                .map(this::scan)
+                .collect(toList());
+    }
 
     @Override
     public Camera save(final PostCameraParams params) {
