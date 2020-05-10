@@ -2,16 +2,11 @@ package com.storage.cameras.service;
 
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.rest.params.PostCameraParams;
-import com.storage.cameras.rest.params.ScanCameraParams;
 import com.storage.cameras.rest.params.SearchCameraParams;
 import java.util.List;
 import javassist.NotFoundException;
 
 public interface CameraService {
-
-    Camera scan(ScanCameraParams scanCameraParams);
-
-    List<Camera> scanAll(List<ScanCameraParams> scanCameraParamsList);
 
     Camera save(PostCameraParams params);
 

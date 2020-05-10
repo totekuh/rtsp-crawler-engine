@@ -203,6 +203,10 @@ class RtspClient:
                                    })
             if response.ok:
                 print(f'Camera [{target.url}/{target.status}] has been imported to the backend API')
+            else:
+                print('Failed to submit the camera to the backend API')
+                print(response.status_code)
+                print(response.text)
         except Exception as e:
             if 'refused' in str(e):
                 print('The backend API is not responding. Is there a reachable server?')

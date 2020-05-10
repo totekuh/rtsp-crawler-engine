@@ -16,7 +16,7 @@ services:
     restart: always
     build: ./rtsp-backend
     ports:
-      - '8080:8080'
+      - '8080'
     expose:
       - '8080'
     working_dir: '/rtsp-backend'
@@ -25,16 +25,16 @@ services:
       - spring.datasource.url=jdbc:mariadb://rtsp-mariadb:3306/cameras_db
       - spring.datasource.username=root
       - spring.datasource.password=SuperDuperSecretPass666
-      - TELEGRAM_BOT_TOKEN=zhopa
 
-  #  rtsp-locator:
-  #    depends_on:
-  #      - rtsp-mariadb
-  #      - rtsp-backend
-  #    build: ./rtsp-locator
-  #    working_dir: /rtsp-locator
-  #    entrypoint: '/bin/bash wait-for rtsp-backend:8080 -t 0 -- python3 -u /rtsp-locator/rtsp-spyglass.py --country-code $COUNTRY_CODE --import-endpoint http://rtsp-backend:8080/cameras/import'
-  #
+  rtsp-locator:
+    depends_on:
+      - rtsp-mariadb
+      - rtsp-backend
+    environment:
+      - SHODAN_API_KEY=1
+      - COUNTRY_CODE=ES
+    build: ./rtsp-locator
+
   #  rtsp-health-checker:
   #    depends_on:
   #      - rtsp-mariadb
