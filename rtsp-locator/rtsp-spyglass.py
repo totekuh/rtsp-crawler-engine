@@ -4,6 +4,7 @@ from os import system
 import requests
 import os
 
+
 def get_arguments():
     from argparse import ArgumentParser
 
@@ -18,13 +19,21 @@ def get_arguments():
                         required=False,
                         help='A country code to use while searching for the exposed cameras. '
                              'If this argument is omitted, then script scans all existing country codes.')
+    parser.add_argument('--city',
+                        dest='city',
+                        required=False,
+                        help='Specify a city name to search exposed cameras. '
+                             'This option can be used only valid with the Shodan API key.')
     parser.add_argument('--shodan-api-key',
                         dest='shodan_api_key',
                         required=False,
                         help='A Shodan api-key to perform requests vid Shodan Search Engine '
                              'instead of the blind Internet scanning')
-
-    return parser.parse_args()
+    options = parser.parse_args()
+    if options.city and not options.shodan_api_key:
+        parser.error("You can't search the cameras by the given city without the Shodan API key. "
+                     "Use --help for more info.")
+    return options
 
 
 options = get_arguments()
@@ -1022,19 +1031,32 @@ if options.shodan_api_key:
     if ';' in shodan_api_key or '|' in shodan_api_key or '&&' in shodan_api_key or '#' in shodan_api_key:
         raise Exception("I can break rules, too. Goodbye.")
     system(f'shodan init {shodan_api_key}')
-    for country in filtered_countries:
-        country_name = country['country_name']
-        print(f'Using Shodan Search Engine to gather cameras from {country_name}')
-        country_code = country['country_code']
-        system(f"shodan download {country_code} 'port:554 country:{country_code}'")
-        output_file = f'{country_code}.json.gz'
+    if options.city:
+        city = options.city
+        print(f'Using Shodan Search Engine to gather cameras from {city}')
+        system(f"shodan download {city} 'port:554 city:{city}'")
+        output_file = f'{city}.json.gz'
         if os.path.exists(output_file):
             print('Unpacking the shodan result file')
             system(f'gunzip {output_file}')
             print('Starting the rtsp crawler to identify each camera')
-            system(f'python3 -u rtsp-probe.py -bj {country_code}.json --import {import_endpoint}')
+            system(f'python3 -u rtsp-probe.py -bj {city}.json --import {import_endpoint}')
         else:
-            print(f'Shodan has not created any result file for {country_name}')
+            print(f'Shodan has not created any result file for {city}')
+    else:
+        for country in filtered_countries:
+            country_name = country['country_name']
+            print(f'Using Shodan Search Engine to gather cameras from {country_name}')
+            country_code = country['country_code']
+            system(f"shodan download {country_code} 'port:554 country:{country_code}'")
+            output_file = f'{country_code}.json.gz'
+            if os.path.exists(output_file):
+                print('Unpacking the shodan result file')
+                system(f'gunzip {output_file}')
+                print('Starting the rtsp crawler to identify each camera')
+                system(f'python3 -u rtsp-probe.py -bj {country_code}.json --import {import_endpoint}')
+            else:
+                print(f'Shodan has not created any result file for {country_name}')
 else:
     print('No shodan api key was found, starting the blind Internet scan')
     for country in filtered_countries:
