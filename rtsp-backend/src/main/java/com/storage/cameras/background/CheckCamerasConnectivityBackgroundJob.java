@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import com.storage.cameras.model.Camera;
 import com.storage.cameras.service.CameraService;
+import com.storage.cameras.service.LabelService;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
@@ -17,16 +18,18 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class CheckCamerasConnectivityBackgroundJob {
     private final CameraService cameraService;
+    private final LabelService labelService;
 
     @PostConstruct
     public void lookup() {
-        final CheckCamerasConnectivityThread thread = new CheckCamerasConnectivityThread(cameraService);
+        final CheckCamerasConnectivityThread thread = new CheckCamerasConnectivityThread(cameraService, labelService);
         new Thread(thread).start();
     }
 
     @AllArgsConstructor
     private static final class CheckCamerasConnectivityThread implements Runnable {
         private final CameraService cameraService;
+        private final LabelService labelService;
         private static final long SLEEPING_TIMER_IN_MS = 1800 * 1000;
 
         @Override
@@ -45,6 +48,7 @@ public class CheckCamerasConnectivityBackgroundJob {
                             log.warn("Lost connection to the {} camera in {}, deleting it from the database",
                                     camera.getUrl(),
                                     camera.getCountryName());
+                            labelService.unlinkLabelsFromCamera(camera.getId());
                             cameraService.delete(camera.getId());
                         }
                     });
