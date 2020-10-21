@@ -7,7 +7,7 @@ ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.s
 RUN apt-get update \
 && pip3 install https://github.com/mitsuhiko/click/tarball/master \
 && easy_install shodan \
-&& apt-get install masscan gcc libglib2.0-0 libsm6 libxext6 libxrender-dev gzip -y
+&& apt-get install libgl1 masscan gcc libglib2.0-0 libsm6 libxext6 libxrender-dev gzip -y
 
 COPY ./*.py /rtsp-locator/
 WORKDIR /rtsp-locator
